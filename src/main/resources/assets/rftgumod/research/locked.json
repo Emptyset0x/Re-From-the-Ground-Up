@@ -1,0 +1,16 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:barrier"
+    },
+    "title": "Locked Recipes",
+    "description": "Try to craft something not yet researched",
+    "hidden": true
+  },
+  "parent": "rftgumod:research/root",
+  "criteria": {
+    "ftgu": {
+      "trigger": "rftgumod:recipe_locked"
+    }
+  }
+}

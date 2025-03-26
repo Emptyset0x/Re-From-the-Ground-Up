@@ -107,6 +107,9 @@ repositories {
         name 'CleanroomMC Maven'
         url 'https://maven.cleanroommc.com'
     }
+    maven {
+        url 'https://maven.blamejared.com'
+    }
 }
 
 dependencies {
@@ -144,6 +147,10 @@ dependencies {
         testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
+    compileOnly "net.darkhax.bookshelf:Bookshelf-1.12.2:+"
+    compileOnly "net.darkhax.gamestages:GameStages-1.12.2:+"
+
+    compileOnly "mezz.jei:jei_1.12.2:+"
 }
 
 apply from: 'gradle/scripts/dependencies.gradle'
@@ -151,7 +158,7 @@ apply from: 'gradle/scripts/dependencies.gradle'
 // Adds Access Transformer files to tasks
 if (propertyBool('use_access_transformer')) {
     for (def location : propertyStringList('access_transformer_locations')) {
-        def fileLocation = file("${projectDir}/src/main/resources/${location}")
+        def fileLocation = file("${projectDir}/src/main/resources/META-INF/${location}")
         if (fileLocation.exists()) {
             tasks.deobfuscateMergedJarToSrg.accessTransformerFiles.from(fileLocation)
             tasks.srgifyBinpatchedJar.accessTransformerFiles.from(fileLocation)

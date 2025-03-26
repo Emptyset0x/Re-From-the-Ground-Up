@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "rftgumod:research_table"
+    },
+    "facing=south": {
+      "model": "rftgumod:research_table",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "rftgumod:research_table",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "rftgumod:research_table",
+      "y": 90
+    }
+  }
+}

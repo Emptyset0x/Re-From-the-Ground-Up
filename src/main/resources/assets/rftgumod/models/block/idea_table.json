@@ -1,0 +1,9 @@
+{
+  "parent": "block/orientable",
+  "textures": {
+    "up": "rftgumod:blocks/idea_table_top",
+    "front": "rftgumod:blocks/idea_table_front",
+    "side": "rftgumod:blocks/idea_table_side",
+    "down": "minecraft:blocks/planks_oak"
+  }
+}

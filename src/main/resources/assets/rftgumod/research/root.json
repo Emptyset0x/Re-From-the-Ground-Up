@@ -1,0 +1,24 @@
+{
+  "display": {
+    "icon": {
+      "item": "rftgumod:research_book"
+    },
+    "title": "From the Ground Up",
+    "description": "Because nothing is free",
+    "background": "rftgumod:textures/gui/advancements/backgrounds/parchment.png",
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "research": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "rftgumod:research_book"
+          }
+        ]
+      }
+    }
+  }
+}

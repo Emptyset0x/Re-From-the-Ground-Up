@@ -1,0 +1,19 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "S",
+    "P",
+    "S"
+  ],
+  "key": {
+    "S": {
+      "item": "#stickWood"
+    },
+    "P": {
+      "item": "#paper"
+    }
+  },
+  "result": {
+    "item": "rftgumod:parchment_empty"
+  }
+}

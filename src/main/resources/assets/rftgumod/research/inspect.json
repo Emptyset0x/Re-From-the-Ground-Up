@@ -1,0 +1,15 @@
+{
+  "display": {
+    "icon": {
+      "item": "rftgumod:magnifying_glass"
+    },
+    "title": "Sherlock Holmes",
+    "description": "Find hidden meaning in a block"
+  },
+  "parent": "rftgumod:research/research",
+  "criteria": {
+    "ftgu": {
+      "trigger": "rftgumod:block_inspected"
+    }
+  }
+}

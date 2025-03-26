@@ -1,0 +1,29 @@
+{
+  "display": {
+    "icon": {
+      "item": "rftgumod:parchment_idea"
+    },
+    "title": {
+      "translate": "technology.research.name"
+    },
+    "description": {
+      "translate": "technology.research.desc"
+    },
+    "background": "rftgumod:textures/gui/advancements/backgrounds/parchment.png",
+    "x": 0,
+    "y": 0
+  },
+  "start": true,
+  "parent": "rftgumod:survival/survival",
+  "unlock": [
+    {
+      "type": "forge:ore_dict",
+      "ore": "paper"
+    },
+    "rftgumod:parchment_empty",
+    "rftgumod:idea_table",
+    "rftgumod:research_table",
+    "rftgumod:research_book",
+    "rftgumod:magnifying_glass"
+  ]
+}

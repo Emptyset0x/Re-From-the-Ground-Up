@@ -1,0 +1,88 @@
+{
+  "pools": [
+    {
+      "name": "rftgumod:refinement",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "rftgumod:parchment_research",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_nbt",
+              "tag": "{RFTGU:\"rftgumod:survival/refinement\"}"
+            }
+          ]
+        },
+        {
+          "type": "empty",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "name": "rftgumod:smithing",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "rftgumod:parchment_research",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_nbt",
+              "tag": "{RFTGU:\"rftgumod:survival/smithing\"}"
+            }
+          ]
+        },
+        {
+          "type": "empty",
+          "weight": 7
+        }
+      ]
+    },
+    {
+      "name": "rftgumod:metal_armor",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "rftgumod:parchment_research",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_nbt",
+              "tag": "{RFTGU:\"rftgumod:survival/metal_armor\"}"
+            }
+          ]
+        },
+        {
+          "type": "empty",
+          "weight": 7
+        }
+      ]
+    },
+    {
+      "name": "rftgumod:lapidary",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "rftgumod:parchment_research",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_nbt",
+              "tag": "{RFTGU:\"rftgumod:survival/lapidary\"}"
+            }
+          ]
+        },
+        {
+          "type": "empty",
+          "weight": 15
+        }
+      ]
+    }
+  ]
+}
