@@ -1,5 +1,6 @@
 package rftgumod.client.gui;
 
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -42,6 +43,8 @@ public class GuiResearchBook extends GuiScreen {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final ResourceLocation ACHIEVEMENT_BACKGROUND = new ResourceLocation(RFTGU.MODID,
             "textures/gui/achievement/achievement_background.png");
+    private static final ResourceLocation WINDOW = new ResourceLocation(RFTGU.MODID,
+            "textures/gui/achievement/window.png");
     private static final ResourceLocation STAINED_CLAY = new ResourceLocation(
             "textures/blocks/hardened_clay_stained_cyan.png");
     private static final ResourceLocation RECIPE_BOOK = new ResourceLocation("textures/gui/recipe_book.png");
@@ -69,6 +72,10 @@ public class GuiResearchBook extends GuiScreen {
     private double xLastScroll;
     private double yLastScroll;
     private int pages;
+
+    private static final int WIDTH = 252, HEIGHT = 140, CORNER_SIZE = 30;
+    private static final int SIDE = 30, TOP = 40, BOTTOM = 30, PADDING = 9;
+
 
     public GuiResearchBook(EntityPlayer player) {
         this.player = player;
@@ -207,7 +214,7 @@ public class GuiResearchBook extends GuiScreen {
                 int k = i + 8;
                 int l = j + 17;
 
-                if ((scrolling == 0 || scrolling == 1) && x >= k && x < k + 224 && y >= l && y < l + 155) {
+                if ((scrolling == 0 || scrolling == 1) && x >= SIDE + PADDING && x < width - SIDE - PADDING && y >= TOP + PADDING && y < height - BOTTOM - PADDING) {
                     if (scrolling == 0) {
                         scrolling = 1;
                     } else {
@@ -233,10 +240,10 @@ public class GuiResearchBook extends GuiScreen {
                     MathHelper.clamp(i1 < 0 ? f3 + 0.25F : i1 > 0 ? f3 - 0.25F : f3, 1.0F, 2.0F));
 
             if (zoom.get(root.getRegistryName()) != f3) {
-                float f4 = f3 * imageWidth;
-                float f = f3 * imageHeight;
-                float f1 = zoom.get(root.getRegistryName()) * imageWidth;
-                float f2 = zoom.get(root.getRegistryName()) * imageHeight;
+                float f4 = f3 * (width - SIDE - SIDE);
+                float f = f3 * (height - TOP - BOTTOM);
+                float f1 = zoom.get(root.getRegistryName()) * (width - SIDE - SIDE);
+                float f2 = zoom.get(root.getRegistryName()) * (height - TOP - BOTTOM);
 
                 xScrollP -= (f1 - f4) * 0.5F;
                 yScrollP -= (f2 - f) * 0.5F;
@@ -295,32 +302,52 @@ public class GuiResearchBook extends GuiScreen {
     }
 
     private void drawTitle() {
-        int i = (width - imageWidth) / 2;
-        int j = (height - imageHeight) / 2;
-        fontRenderer.drawString(I18n.format("item.research_book.name"), i + 15, j + 5, 0x404040);
+        fontRenderer.drawString(I18n.format("item.research_book.name"), SIDE + 8, TOP + 6, 0x404040);
     }
 
     private void drawResearchScreen(int x, int y, float z) {
-        int k = (width - imageWidth)  / 2;
-        int l = (height - imageHeight) / 2;
+        int left = SIDE;
+        int top = TOP;
+
+        int right = width - SIDE;
+        int bottom = height - SIDE;
+
+        int k = SIDE;
+        int l = TOP;
         int i1 = k + 16;
         int j1 = l + 17;
 
+        int boxLeft = left + PADDING;
+        int boxTop = top + 2*PADDING;
+        int boxRight = right - PADDING;
+        int boxBottom = bottom - PADDING;
+        int boxWidth = boxRight - boxLeft;
+        int boxHeight = boxBottom - boxTop;
+
         GlStateManager.depthFunc(518);
         GlStateManager.pushMatrix();
-        GlStateManager.translate(i1, j1, -200F);
+        GlStateManager.translate(boxLeft , boxTop, -200F);
         GlStateManager.enableTexture2D();
         GlStateManager.disableLighting();
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableColorMaterial();
 
-        for (int l3 = 0; l3 < 10; l3++) {
-            for (int i4 = 0; i4 < 14; i4++) {
+        int chunkHeight = boxHeight / 16 + 1;
+        int chunkWidth = boxWidth / 16 + 1;
+        for (int l3 = 0; l3 < chunkHeight; l3++) {
+            for (int i4 = 0; i4 < chunkWidth; i4++) {
                 if (root.getDisplayInfo().getBackground() == null)
                     mc.getTextureManager().bindTexture(STAINED_CLAY);
                 else
                     mc.getTextureManager().bindTexture(root.getDisplayInfo().getBackground());
-                drawModalRectWithCustomSizedTexture(i4 * 16, l3 * 16, 0, 0, 16, 16, 16, 16);
+                if (l3 < chunkHeight - 1 && i4 < chunkWidth - 1)
+                    drawModalRectWithCustomSizedTexture(i4 * 16, l3 * 16, 0, 0, 16, 16, 16, 16);
+                if (l3 == chunkHeight - 1 && i4 < chunkWidth - 1)
+                    drawModalRectWithCustomSizedTexture(i4 * 16, l3 * 16, 0, 0, 16, boxHeight % 16, 16, 16);
+                if (l3 < chunkHeight - 1 && i4 == chunkWidth - 1)
+                    drawModalRectWithCustomSizedTexture(i4 * 16, l3 * 16, 0, 0, boxWidth % 16, 16, 16, 16);
+                if (l3 == chunkHeight - 1 && i4 == chunkWidth - 1)
+                    drawModalRectWithCustomSizedTexture(i4 * 16, l3 * 16, 0, 0, boxWidth % 16, boxHeight % 16, 16, 16);
             }
         }
         mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
@@ -404,8 +431,8 @@ public class GuiResearchBook extends GuiScreen {
                             continue;
                         int l6 = (int) (t2.getDisplayInfo().getX() * 24 - i);
                         int j7 = (int) (t2.getDisplayInfo().getY() * 24 - j);
-                        if (l6 < -24 || j7 < -24 || l6 > 224F * zoom.get(root.getRegistryName())
-                                || j7 > 155F * zoom.get(root.getRegistryName()))
+                        if (l6 < -24 || j7 < -24 || l6 > (float)(boxRight - boxLeft) * zoom.get(root.getRegistryName())
+                                || j7 > (float)(boxBottom - boxTop) * zoom.get(root.getRegistryName()))
                             continue;
 
                         if (t2.isResearched(player))
@@ -553,8 +580,24 @@ public class GuiResearchBook extends GuiScreen {
         GlStateManager.enableBlend();
         GlStateManager.popMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
-        drawTexturedModalRect(k, l, 0, 0, imageWidth, imageHeight);
+        mc.getTextureManager().bindTexture(WINDOW);
+//        drawTexturedModalRect(k, l, 0, 0, imageWidth, imageHeight);
+
+        this.drawTexturedModalRect(left, top, 0, 0, CORNER_SIZE, CORNER_SIZE);
+        // Top side
+        renderRepeating(this, left + CORNER_SIZE, top, width - CORNER_SIZE - 2*SIDE - CORNER_SIZE, CORNER_SIZE, CORNER_SIZE, 0, WIDTH - CORNER_SIZE - CORNER_SIZE, CORNER_SIZE);
+        // Top right corner
+        this.drawTexturedModalRect(right - CORNER_SIZE, top, WIDTH - CORNER_SIZE, 0, CORNER_SIZE, CORNER_SIZE);
+        // Left side
+        renderRepeating(this, left, top + CORNER_SIZE, CORNER_SIZE, bottom - top - 2 * CORNER_SIZE, 0, CORNER_SIZE, CORNER_SIZE, HEIGHT - CORNER_SIZE - CORNER_SIZE);
+        // Right side
+        renderRepeating(this, right - CORNER_SIZE, top + CORNER_SIZE, CORNER_SIZE, bottom - top - 2 * CORNER_SIZE, WIDTH - CORNER_SIZE, CORNER_SIZE, CORNER_SIZE, HEIGHT - CORNER_SIZE - CORNER_SIZE);
+        // Bottom left corner
+        this.drawTexturedModalRect(left, bottom - CORNER_SIZE, 0, HEIGHT - CORNER_SIZE, CORNER_SIZE, CORNER_SIZE);
+        // Bottom side
+        renderRepeating(this, left + CORNER_SIZE, bottom - CORNER_SIZE, width - CORNER_SIZE - 2*SIDE - CORNER_SIZE, CORNER_SIZE, CORNER_SIZE, HEIGHT - CORNER_SIZE, WIDTH - CORNER_SIZE - CORNER_SIZE, CORNER_SIZE);
+        // Bottom right corner
+        this.drawTexturedModalRect(right - CORNER_SIZE, bottom - CORNER_SIZE, WIDTH - CORNER_SIZE, HEIGHT - CORNER_SIZE, CORNER_SIZE, CORNER_SIZE);
 
         zLevel = 0.0F;
         GlStateManager.depthFunc(515);
@@ -619,5 +662,20 @@ public class GuiResearchBook extends GuiScreen {
     public boolean doesGuiPauseGame() {
         return false;
     }
+
+    public static void renderRepeating(Gui screen, int x, int y, int width, int height, int textureX, int textureY, int textureWidth, int textureHeight) {
+        for (int i = 0; i < width; i += textureWidth) {
+            int drawX = x + i;
+            int drawWidth = Math.min(textureWidth, width - i);
+
+            for (int l = 0; l < height; l += textureHeight) {
+                int drawY = y + l;
+                int drawHeight = Math.min(textureHeight, height - l);
+                screen.drawTexturedModalRect(drawX, drawY, textureX, textureY, drawWidth, drawHeight);
+            }
+        }
+    }
+
+
 
 }
