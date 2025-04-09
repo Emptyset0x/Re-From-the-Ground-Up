@@ -24,6 +24,7 @@ import org.lwjgl.input.Mouse;
 import rftgumod.RFTGU;
 import rftgumod.api.technology.ITechnology;
 import rftgumod.api.technology.unlock.IUnlock;
+import rftgumod.client.gui.tab.BetterTabType;
 import rftgumod.client.proxy.ProxyClient;
 import rftgumod.common.Content;
 import rftgumod.common.config.RFTGUConfig;
@@ -45,18 +46,22 @@ public class GuiResearchBook extends GuiScreen {
             "textures/gui/achievement/achievement_background.png");
     private static final ResourceLocation WINDOW = new ResourceLocation(RFTGU.MODID,
             "textures/gui/achievement/window.png");
+    private static final ResourceLocation TABS = new ResourceLocation(RFTGU.MODID,
+            "textures/gui/achievement/tabs.png");
     private static final ResourceLocation STAINED_CLAY = new ResourceLocation(
             "textures/blocks/hardened_clay_stained_cyan.png");
     private static final ResourceLocation RECIPE_BOOK = new ResourceLocation("textures/gui/recipe_book.png");
     public static Map<ResourceLocation, Float> zoom;
     public static Map<ResourceLocation, Double> xScrollO;
     public static Map<ResourceLocation, Double> yScrollO;
-    private static boolean state = true;
+    private static boolean state;
     private static Technology root;
     private static Technology selected;
     private static int scroll = 1;
     private final EntityPlayer player;
     private final int num = 4;
+    private static BetterTabType type;
+
 
     private int x_min;
     private int y_min;
@@ -72,6 +77,7 @@ public class GuiResearchBook extends GuiScreen {
     private double xLastScroll;
     private double yLastScroll;
     private int pages;
+
 
     private static final int WIDTH = 252, HEIGHT = 140, CORNER_SIZE = 30;
     private static final int SIDE = 30, TOP = 40, BOTTOM = 30, PADDING = 9;
@@ -599,6 +605,30 @@ public class GuiResearchBook extends GuiScreen {
         // Bottom right corner
         this.drawTexturedModalRect(right - CORNER_SIZE, bottom - CORNER_SIZE, WIDTH - CORNER_SIZE, HEIGHT - CORNER_SIZE, CORNER_SIZE, CORNER_SIZE);
 
+        type = BetterTabType.getTabType(right - left, bottom - top, (int)TechnologyManager.INSTANCE.getRoots().stream().filter(t -> t.canResearchIgnoreResearched(player)).count() );
+        if ((int)TechnologyManager.INSTANCE.getRoots().stream().filter(t -> t.canResearchIgnoreResearched(player)).count() > 1 ) {
+            mc.getTextureManager().bindTexture(TABS);
+            int index = 0;
+            for (Technology tech : TechnologyManager.INSTANCE.getRoots()){
+                if (tech.canResearchIgnoreResearched(player)) {
+                    type.draw(this, left, top, right - left, bottom - top, tech == selected , index);
+                    index++;
+                }
+            }
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+            RenderHelper.enableGUIStandardItemLighting();
+            int iconIndex = 0;
+            for (Technology tech : TechnologyManager.INSTANCE.getRoots()) {
+                if (tech.canResearchIgnoreResearched(player)) {
+                    type.drawIcon(left, top, right - left, bottom - top, iconIndex, mc.getRenderItem(), tech.getDisplayInfo().getIcon() );
+                    iconIndex++;
+                }
+            }
+            GlStateManager.disableLighting();
+            GlStateManager.popMatrix();
+        }
+
         zLevel = 0.0F;
         GlStateManager.depthFunc(515);
         GlStateManager.disableDepth();
@@ -623,8 +653,6 @@ public class GuiResearchBook extends GuiScreen {
                 if (selected.isResearched(player) || children > 0)
                     i9 += 12;
 
-                drawGradientRect(i7 - 3, k7 - 3, i7 + j8 + 3, k7 + i9 + 3 + 12, 0xc0000000, 0xc0000000);
-                fontRenderer.drawSplitString(s1, i7, k7 + 12, j8, 0xffa0a0a0);
                 if (selected.isResearched(player))
                     fontRenderer.drawStringWithShadow(I18n.format("technology.researched"), i7, k7 + i9 + 4,
                             0xff9090ff);
@@ -675,7 +703,6 @@ public class GuiResearchBook extends GuiScreen {
             }
         }
     }
-
 
 
 }

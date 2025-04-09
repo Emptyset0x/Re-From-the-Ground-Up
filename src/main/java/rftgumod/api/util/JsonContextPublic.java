@@ -35,7 +35,6 @@ public class JsonContextPublic extends JsonContext {
             constants.put(JsonUtils.getString(json, "name"),
                     RFTGUAPI.stackUtils.getItemPredicate(json.get("ingredient"), this));
         }
-
     }
 
 }
