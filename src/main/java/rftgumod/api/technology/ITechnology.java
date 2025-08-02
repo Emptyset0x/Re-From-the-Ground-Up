@@ -10,6 +10,7 @@ import net.minecraft.util.text.ITextComponent;
 import rftgumod.api.technology.recipe.IIdeaRecipe;
 import rftgumod.api.technology.recipe.IResearchRecipe;
 import rftgumod.api.technology.unlock.IUnlock;
+import rftgumod.common.technology.Chapter;
 
 import java.util.Map;
 import java.util.Set;
@@ -198,5 +199,10 @@ public interface ITechnology {
         String getGameStage();
 
         ResourceLocation getRegistryName();
+
+        boolean hasChapter();
+        Chapter getChapter();
+        String getSubtilte();
+        boolean isChapterEqual(Chapter chapter);
 
 }

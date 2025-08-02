@@ -21,6 +21,7 @@ public class TechnologyBuilder implements ITechnologyBuilder {
     private Technology original;
 
     private ResourceLocation parent;
+    private ResourceLocation chapter;
     private DisplayInfo display;
     private AdvancementRewards rewards;
     private Map<String, Criterion> criteria;
@@ -31,6 +32,8 @@ public class TechnologyBuilder implements ITechnologyBuilder {
     private IIdeaRecipe idea;
     private IResearchRecipe research;
     private String stage;
+    private String subtilte;
+
 
     public TechnologyBuilder(ResourceLocation id) {
         this.original = null;
@@ -60,6 +63,8 @@ public class TechnologyBuilder implements ITechnologyBuilder {
         idea = tech.idea;
         research = tech.research;
         stage = tech.stage;
+        if (tech.hasChapter())
+            chapter = tech.chapter.getRegistryName();
     }
 
     @Override
@@ -124,6 +129,19 @@ public class TechnologyBuilder implements ITechnologyBuilder {
     }
 
     @Override
+    public ITechnologyBuilder setChapter(ResourceLocation chapter) {
+        this.chapter = chapter;
+        return this;
+    }
+
+    @Override
+    public ITechnologyBuilder setSubtilte(String subtilte) {
+        this.subtilte = subtilte;
+        return null;
+    }
+
+
+    @Override
     public void save() {
         if (original == null)
             throw new NullPointerException("Trying to save to a null technology");
@@ -155,11 +173,12 @@ public class TechnologyBuilder implements ITechnologyBuilder {
     @Override
     public Technology build() {
         Technology parent = this.parent == null ? null : TechnologyManager.INSTANCE.getTechnology(this.parent);
+        Chapter chapter = this.chapter == null ? null : TechnologyManager.INSTANCE.getChapter(this.chapter);
         if (this.parent != null && parent == null)
             throw new NullPointerException("Unknown technology '" + this.parent + "'");
 
         original = new Technology(id, parent, display, rewards, criteria, requirements, start, copy, unlock, idea,
-                research, stage);
+                research, stage, chapter, subtilte);
         return original;
     }
 

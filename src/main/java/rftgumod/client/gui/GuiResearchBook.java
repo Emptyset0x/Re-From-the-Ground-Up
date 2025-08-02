@@ -30,9 +30,11 @@ import rftgumod.common.Content;
 import rftgumod.common.config.RFTGUConfig;
 import rftgumod.common.packet.PacketDispatcher;
 import rftgumod.common.packet.server.CopyTechMessage;
+import rftgumod.common.technology.Chapter;
 import rftgumod.common.technology.Technology;
 import rftgumod.common.technology.TechnologyManager;
 import rftgumod.util.StackUtils;
+import rftgumod.util.SubCollection;
 
 import java.io.IOException;
 import java.util.*;
@@ -54,9 +56,10 @@ public class GuiResearchBook extends GuiScreen {
     public static Map<ResourceLocation, Float> zoom;
     public static Map<ResourceLocation, Double> xScrollO;
     public static Map<ResourceLocation, Double> yScrollO;
-    private static boolean state;
+    private static boolean showResearchTree;
     private static Technology root;
     private static Technology selected;
+    private static Chapter selectedChapter;
     private static int scroll = 1;
     private final EntityPlayer player;
     private final int num = 4;
@@ -97,20 +100,21 @@ public class GuiResearchBook extends GuiScreen {
                 }
             }
         }
+
     }
 
     @Override
     public void initGui() {
         if (selected == null || !TechnologyManager.INSTANCE.contains(selected) || !selected.isResearched(player)) {
             selected = null;
-            state = true;
+            showResearchTree = true;
         }
 
         xScrollP = xScrollTarget = xScrollO.get(root.getRegistryName());
         yScrollP = yScrollTarget = yScrollO.get(root.getRegistryName());
 
         buttonList.clear();
-        if (state) {
+        if (showResearchTree) {
             Set<Technology> tree = new HashSet<>();
             root.getChildren(tree, true);
 
@@ -168,29 +172,33 @@ public class GuiResearchBook extends GuiScreen {
     @Override
     protected void actionPerformed(GuiButton button) {
         if (button.id == 1) {
-            if (state) {
+            if (showResearchTree) {
                 mc.displayGuiScreen(null);
                 mc.setIngameFocus();
             } else {
-                state = true;
+                showResearchTree = true;
                 initGui();
             }
         } else if (button.id == 2) {
-            if (state) {
+            if (showResearchTree) {
                 Technology first = null;
                 boolean next = false;
-                for (Technology technology : TechnologyManager.INSTANCE.getRoots()) {
-                    if (technology.canResearchIgnoreResearched(player)) {
-                        if (next) {
-                            next = false;
-                            root = technology;
-                            break;
+                for (Chapter chapter : TechnologyManager.INSTANCE.getChapters()) {
+                    for (Technology technology : TechnologyManager.INSTANCE.getRoots()){
+                        if (technology.isChapterEqual(chapter)) {
+                            if (technology.canResearchIgnoreResearched(player)) {
+                                if (next) {
+                                    next = false;
+                                    root = technology;
+                                    break;
+                                }
+                                if (first == null)
+                                    first = technology;
+                            }
+                            if (technology == root)
+                                next = true;
                         }
-                        if (first == null)
-                            first = technology;
                     }
-                    if (technology == root)
-                        next = true;
                 }
                 if (next)
                     root = first;
@@ -213,12 +221,8 @@ public class GuiResearchBook extends GuiScreen {
 
     @Override
     public void drawScreen(int x, int y, float z) {
-        if (state) {
+        if (showResearchTree) {
             if (Mouse.isButtonDown(0)) {
-                int i = (width - imageWidth) / 2;
-                int j = (height - imageHeight) / 2;
-                int k = i + 8;
-                int l = j + 17;
 
                 if ((scrolling == 0 || scrolling == 1) && x >= SIDE + PADDING && x < width - SIDE - PADDING && y >= TOP + PADDING && y < height - BOTTOM - PADDING) {
                     if (scrolling == 0) {
@@ -240,19 +244,19 @@ public class GuiResearchBook extends GuiScreen {
                 scrolling = 0;
             }
 
-            int i1 = Mouse.getDWheel();
-            float f3 = zoom.get(root.getRegistryName());
+            int dWheel = Mouse.getDWheel();
+            float rootZoom = zoom.get(root.getRegistryName());
             zoom.put(root.getRegistryName(),
-                    MathHelper.clamp(i1 < 0 ? f3 + 0.25F : i1 > 0 ? f3 - 0.25F : f3, 1.0F, 2.0F));
+                    MathHelper.clamp(dWheel < 0 ? rootZoom + 0.25F : dWheel > 0 ? rootZoom - 0.25F : rootZoom, 1.0F, 2.0F));
 
-            if (zoom.get(root.getRegistryName()) != f3) {
-                float f4 = f3 * (width - SIDE - SIDE);
-                float f = f3 * (height - TOP - BOTTOM);
-                float f1 = zoom.get(root.getRegistryName()) * (width - SIDE - SIDE);
-                float f2 = zoom.get(root.getRegistryName()) * (height - TOP - BOTTOM);
+            if (zoom.get(root.getRegistryName()) != rootZoom) {
+                float zoomScreenWidth = rootZoom * (width - SIDE - SIDE);
+                float zoomScreenHeight = rootZoom * (height - TOP - BOTTOM);
+                float actualScreenWidth = zoom.get(root.getRegistryName()) * (width - SIDE - SIDE);
+                float actualScreenHeight = zoom.get(root.getRegistryName()) * (height - TOP - BOTTOM);
 
-                xScrollP -= (f1 - f4) * 0.5F;
-                yScrollP -= (f2 - f) * 0.5F;
+                xScrollP -= (actualScreenWidth - zoomScreenWidth) * 0.5F;
+                yScrollP -= (actualScreenHeight - zoomScreenHeight) * 0.5F;
 
                 xScrollTarget = xScrollP;
                 yScrollTarget = yScrollP;
@@ -286,7 +290,7 @@ public class GuiResearchBook extends GuiScreen {
     @Override
     public void mouseClicked(int x, int y, int b) throws IOException {
         if (b == 0 && selected != null && selected.isResearched(player)) {
-            state = false;
+            showResearchTree = false;
             initGui();
         }
         super.mouseClicked(x, y, b);
@@ -296,14 +300,14 @@ public class GuiResearchBook extends GuiScreen {
     public void updateScreen() {
         xScrollO.put(root.getRegistryName(), xScrollP);
         yScrollO.put(root.getRegistryName(), yScrollP);
-        double d0 = xScrollTarget - xScrollP;
-        double d1 = yScrollTarget - yScrollP;
-        if (d0 * d0 + d1 * d1 < 4D) {
-            xScrollP += d0;
-            yScrollP += d1;
+        double xDistance = xScrollTarget - xScrollP;
+        double yDistance = yScrollTarget - yScrollP;
+        if (xDistance * xDistance + yDistance * yDistance < 4D) {
+            xScrollP += xDistance;
+            yScrollP += yDistance;
         } else {
-            xScrollP += d0 * 0.85D;
-            yScrollP += d1 * 0.85D;
+            xScrollP += xDistance * 0.85D;
+            yScrollP += yDistance * 0.85D;
         }
     }
 
@@ -312,16 +316,18 @@ public class GuiResearchBook extends GuiScreen {
     }
 
     private void drawResearchScreen(int x, int y, float z) {
+
+        int k = (width - imageWidth) / 2;
+        int l = (height - imageHeight) / 2;
+
         int left = SIDE;
         int top = TOP;
 
         int right = width - SIDE;
         int bottom = height - SIDE;
 
-        int k = SIDE;
-        int l = TOP;
-        int i1 = k + 16;
-        int j1 = l + 17;
+        int i1 = SIDE + 16;
+        int j1 = TOP + 17;
 
         int boxLeft = left + PADDING;
         int boxTop = top + 2*PADDING;
@@ -360,53 +366,53 @@ public class GuiResearchBook extends GuiScreen {
 
         GlStateManager.enableDepth();
         GlStateManager.depthFunc(515);
-        if (state) {
+        if (showResearchTree) {
             GlStateManager.scale(1.0F / zoom.get(root.getRegistryName()), 1.0F / zoom.get(root.getRegistryName()),
                     1.0F);
 
-            int i = MathHelper.floor(
+            int interpolatedXScroll = MathHelper.floor(
                     xScrollO.get(root.getRegistryName()) + (xScrollP - xScrollO.get(root.getRegistryName())) * z);
-            int j = MathHelper.floor(
+            int interpolatedYScroll = MathHelper.floor(
                     yScrollO.get(root.getRegistryName()) + (yScrollP - yScrollO.get(root.getRegistryName())) * z);
 
-            if (i < x_min)
-                i = x_min;
-            if (j < y_min)
-                j = y_min;
-            if (i >= x_max)
-                i = x_max - 1;
-            if (j >= y_max)
-                j = y_max - 1;
+            if (interpolatedXScroll < x_min)
+                interpolatedXScroll = x_min;
+            if (interpolatedYScroll < y_min)
+                interpolatedYScroll = y_min;
+            if (interpolatedXScroll >= x_max)
+                interpolatedXScroll = x_max - 1;
+            if (interpolatedYScroll >= y_max)
+                interpolatedYScroll = y_max - 1;
 
             Set<Technology> tech = new HashSet<>();
             root.getChildren(tech, true);
 
             if (tech != null) {
                 try {
-                    for (Technology t1 : tech) {
-                        if (!t1.canResearchIgnoreResearched(player))
+                    for (Technology technologyForLines : tech) {
+                        if (!technologyForLines.canResearchIgnoreResearched(player))
                             continue;
-                        if (!t1.isResearched(player) && !t1.isUnlocked(player))
+                        if (!technologyForLines.isResearched(player) && !technologyForLines.isUnlocked(player))
                             continue;
-                        if (t1.getDisplayInfo().isHidden() && !t1.isResearched(player))
+                        if (technologyForLines.getDisplayInfo().isHidden() && !technologyForLines.isResearched(player))
                             continue;
-                        if (t1.getParent() == null || !tech.contains(t1.getParent()))
+                        if (technologyForLines.getParent() == null || !tech.contains(technologyForLines.getParent()))
                             continue;
-                        int xStart = (int) ((t1.getDisplayInfo().getX() * 24 - i) + 11);
-                        int yStart = (int) ((t1.getDisplayInfo().getY() * 24 - j) + 11);
-                        int xStop = (int) ((t1.getParent().getDisplayInfo().getX() * 24 - i) + 11);
-                        int yStop = (int) ((t1.getParent().getDisplayInfo().getY() * 24 - j) + 11);
+                        int xStart = (int) ((technologyForLines.getDisplayInfo().getX() * 24 - interpolatedXScroll) + 11);
+                        int yStart = (int) ((technologyForLines.getDisplayInfo().getY() * 24 - interpolatedYScroll) + 11);
+                        int xStop = (int) ((technologyForLines.getParent().getDisplayInfo().getX() * 24 - interpolatedXScroll) + 11);
+                        int yStop = (int) ((technologyForLines.getParent().getDisplayInfo().getY() * 24 - interpolatedYScroll) + 11);
 
-                        boolean flag = t1.isResearched(player);
+                        boolean flag = technologyForLines.isResearched(player);
 
-                        int l4;
+                        int colorLine;
                         if (flag)
-                            l4 = 0xffa0a0a0;
+                            colorLine = 0xffa0a0a0;
                         else
-                            l4 = 0xff00ff00;
+                            colorLine = 0xff00ff00;
 
-                        drawHorizontalLine(xStart, xStop, yStart, l4);
-                        drawVerticalLine(xStop, yStart, yStop, l4);
+                        drawHorizontalLine(xStart, xStop, yStart, colorLine);
+                        drawVerticalLine(xStop, yStart, yStop, colorLine);
 
                         if (xStart > xStop)
                             drawTexturedModalRect(xStart - 11 - 7, yStart - 5, 114, 234, 7, 11);
@@ -428,43 +434,43 @@ public class GuiResearchBook extends GuiScreen {
                     GlStateManager.enableRescaleNormal();
                     GlStateManager.enableColorMaterial();
 
-                    for (Technology t2 : tech) {
-                        if (!t2.canResearchIgnoreResearched(player))
+                    for (Technology technologyForFrame : tech) {
+                        if (!technologyForFrame.canResearchIgnoreResearched(player))
                             continue;
-                        if (!t2.isResearched(player) && !t2.isUnlocked(player))
+                        if (!technologyForFrame.isResearched(player) && !technologyForFrame.isUnlocked(player))
                             continue;
-                        if (t2.getDisplayInfo().isHidden() && !t2.isResearched(player))
+                        if (technologyForFrame.getDisplayInfo().isHidden() && !technologyForFrame.isResearched(player))
                             continue;
-                        int l6 = (int) (t2.getDisplayInfo().getX() * 24 - i);
-                        int j7 = (int) (t2.getDisplayInfo().getY() * 24 - j);
-                        if (l6 < -24 || j7 < -24 || l6 > (float)(boxRight - boxLeft) * zoom.get(root.getRegistryName())
-                                || j7 > (float)(boxBottom - boxTop) * zoom.get(root.getRegistryName()))
+                        int xPoint = (int) (technologyForFrame.getDisplayInfo().getX() * 24 - interpolatedXScroll);
+                        int yPoint = (int) (technologyForFrame.getDisplayInfo().getY() * 24 - interpolatedYScroll);
+                        if (xPoint < -24 || yPoint < -24 || xPoint > (float)(boxRight - boxLeft) * zoom.get(root.getRegistryName())
+                                || yPoint > (float)(boxBottom - boxTop) * zoom.get(root.getRegistryName()))
                             continue;
 
-                        if (t2.isResearched(player))
+                        if (technologyForFrame.isResearched(player))
                             GlStateManager.color(0.75F, 0.75F, 0.75F, 1.0F);
                         else
                             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
                         mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
                         GlStateManager.enableBlend();
-                        if (t2.hasCustomUnlock())
-                            drawTexturedModalRect(l6 - 2, j7 - 2, 26, 202, 26, 26);
+                        if (technologyForFrame.hasCustomUnlock())
+                            drawTexturedModalRect(xPoint - 2, yPoint - 2, 26, 202, 26, 26);
                         else
-                            drawTexturedModalRect(l6 - 2, j7 - 2, 0, 202, 26, 26);
+                            drawTexturedModalRect(xPoint - 2, yPoint - 2, 0, 202, 26, 26);
                         GlStateManager.disableBlend();
 
                         GlStateManager.disableLighting();
                         GlStateManager.enableCull();
-                        itemRender.renderItemAndEffectIntoGUI(t2.getDisplayInfo().getIcon(), l6 + 3, j7 + 3);
+                        itemRender.renderItemAndEffectIntoGUI(technologyForFrame.getDisplayInfo().getIcon(), xPoint + 3, yPoint + 3);
                         GlStateManager.blendFunc(net.minecraft.client.renderer.GlStateManager.SourceFactor.SRC_ALPHA,
                                 net.minecraft.client.renderer.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
                         GlStateManager.disableLighting();
 
                         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                        if (f3 >= l6 && f3 <= l6 + 22 && f4 >= j7 && f4 <= j7 + 22
-                                && t2.canResearchIgnoreResearched(player))
-                            selected = t2;
+                        if (f3 >= xPoint && f3 <= xPoint + 22 && f4 >= yPoint && f4 <= yPoint + 22
+                                && technologyForFrame.canResearchIgnoreResearched(player))
+                            selected = technologyForFrame;
                     }
                 } catch (ConcurrentModificationException e) {
                     LOGGER.debug("Prevented ConcurrentModificationException while rendering GuiResearchBook");
@@ -481,64 +487,64 @@ public class GuiResearchBook extends GuiScreen {
             GlStateManager.disableLighting();
             GlStateManager.enableRescaleNormal();
             GlStateManager.enableColorMaterial();
-            List<IUnlock> display = selected.getUnlock().stream().filter(IUnlock::isDisplayed)
+            List<IUnlock> displayUnlockList = selected.getUnlock().stream().filter(IUnlock::isDisplayed)
                     .collect(Collectors.toList());
             for (int pos = 0; pos < num; pos++) {
                 int n = pos + (num * (scroll - 1));
-                if (n >= display.size())
+                if (n >= displayUnlockList.size())
                     break;
 
-                ItemStack[] list = display.get(n).getIcon().getMatchingStacks();
+                ItemStack[] unlockItems = displayUnlockList.get(n).getIcon().getMatchingStacks();
 
-                NonNullList[] sub = new NonNullList[list.length];
+                NonNullList[] sub = new NonNullList[unlockItems.length];
                 int length = 0;
 
-                for (int q = 0; q < list.length; q++) {
-                    if (list[q].getItemDamage() == OreDictionary.WILDCARD_VALUE) {
+                for (int q = 0; q < unlockItems.length; q++) {
+                    if (unlockItems[q].getItemDamage() == OreDictionary.WILDCARD_VALUE) {
                         sub[q] = NonNullList.create();
 
                         // noinspection unchecked
-                        list[q].getItem().getSubItems(list[q].getItem().getCreativeTab(), sub[q]);
+                        unlockItems[q].getItem().getSubItems(unlockItems[q].getItem().getCreativeTab(), sub[q]);
                     } else
-                        sub[q] = NonNullList.from(null, list[q]);
+                        sub[q] = NonNullList.from(null, unlockItems[q]);
 
                     length += sub[q].size();
                 }
 
-                list = new ItemStack[length];
+                unlockItems = new ItemStack[length];
                 int pp = 0;
                 for (NonNullList nonNullList : sub)
                     // noinspection unchecked
                     for (ItemStack stack : (NonNullList<ItemStack>) nonNullList)
-                        list[pp++] = stack;
+                        unlockItems[pp++] = stack;
 
                 long tick = mc.world.getTotalWorldTime() / 30;
-                int index = (int) (tick % list.length);
+                int index = (int) (tick % unlockItems.length);
 
-                ItemStack item = list[index];
+                ItemStack item = unlockItems[index];
 
                 mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
                 GlStateManager.enableBlend();
-                drawTexturedModalRect(6, 37 + (pos * 28), 0, 202, 26, 26);
+                drawTexturedModalRect(9 , 9 + (pos * 28), 0, 202, 26, 26);
                 GlStateManager.disableBlend();
 
                 GlStateManager.disableLighting();
                 GlStateManager.enableCull();
-                itemRender.renderItemAndEffectIntoGUI(item, 11, 42 + (pos * 28));
+                itemRender.renderItemAndEffectIntoGUI(item, 9 + 5, 9 + 5 + (pos * 28));
                 GlStateManager.blendFunc(net.minecraft.client.renderer.GlStateManager.SourceFactor.SRC_ALPHA,
                         net.minecraft.client.renderer.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
                 GlStateManager.disableLighting();
 
-                fontRenderer.drawStringWithShadow(item.getDisplayName(), 35, 45 + (pos * 28), 0xFFFFFF);
+                fontRenderer.drawStringWithShadow(item.getDisplayName(), 9 + 29, 9 + 8 + (pos * 28), 0xFFFFFF);
 
-                if (x >= i1 + 6 && x < i1 + 32 && y >= j1 + 37 + (pos * 28) && y < j1 + 63 + (pos * 28)) {
+                if (x >= i1 + 9 && x < i1 + 35 && y >= j1 + 9 + (pos * 28) && y < j1 + 35 + (pos * 28)) {
                     int r = 0;
                     for (IRecipe recipe : ForgeRegistries.RECIPES) {
                         if (StackUtils.INSTANCE.isStackOf(item, recipe.getRecipeOutput())) {
                             mc.getTextureManager().bindTexture(RECIPE_BOOK);
 
-                            int xp = 31 + (r * 25);
-                            int yp = 38 + (pos * 28);
+                            int xp = 34 + (r * 25);
+                            int yp = 10 + (pos * 28);
                             drawTexturedModalRect(xp, yp, 152, 78, 24, 24);
 
                             int width = 3;
@@ -636,10 +642,13 @@ public class GuiResearchBook extends GuiScreen {
 
         super.drawScreen(x, y, z);
         if (selected != null) {
-            if (state) {
+            if (showResearchTree) {
                 String s = selected.getDisplayInfo().getTitle().getFormattedText();
                 String s1 = selected.getDisplayInfo().getDescription().getFormattedText();
-
+                String s3 = null;
+                if (selected.hasChapter()) {
+                    s3 = selected.getChapter().getDisplayInfo().getDescription().getFormattedText();
+                }
                 int children = 0;
                 for (ITechnology child : selected.getChildren())
                     if (child.isRoot())
@@ -660,6 +669,7 @@ public class GuiResearchBook extends GuiScreen {
                     fontRenderer.drawStringWithShadow(I18n.format(children == 1 ? "technology.tab" : "technology.tabs"),
                             i7, k7 + i9 + 4, 0xffff5555);
                 fontRenderer.drawStringWithShadow(s, i7, k7, -1);
+                fontRenderer.drawStringWithShadow(s3, i7, k7 + 12, -1);
             } else {
                 String s1 = selected.getDisplayInfo().getTitle().getFormattedText();
                 int x1 = (width - fontRenderer.getStringWidth(s1)) / 2;
@@ -703,6 +713,4 @@ public class GuiResearchBook extends GuiScreen {
             }
         }
     }
-
-
 }

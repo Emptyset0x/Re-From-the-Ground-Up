@@ -44,6 +44,8 @@ public class Technology implements ITechnology {
     DisplayInfo display;
     NonNullList<IUnlock> unlock;
     Technology parent;
+    Chapter chapter;
+
 
     AdvancementRewards rewards;
     Map<String, Criterion> criteria;
@@ -52,6 +54,7 @@ public class Technology implements ITechnology {
     IIdeaRecipe idea;
     IResearchRecipe research;
 
+    String subtilte;
     String stage;
 
     boolean start;
@@ -60,7 +63,7 @@ public class Technology implements ITechnology {
     Technology(ResourceLocation id, @Nullable Technology parent, DisplayInfo display, AdvancementRewards rewards,
                Map<String, Criterion> criteria, String[][] requirements, boolean start, boolean copy,
                @Nullable NonNullList<IUnlock> unlock, @Nullable IIdeaRecipe idea, @Nullable IResearchRecipe research,
-               String stage) {
+               String stage, Chapter chapter, String subtilte) {
         this.id = id;
         this.parent = parent;
         this.display = display;
@@ -77,6 +80,8 @@ public class Technology implements ITechnology {
         this.research = research;
 
         this.stage = stage;
+        this.chapter = chapter;
+        this.subtilte = subtilte;
 
         if (parent == null)
             level = 1;
@@ -151,9 +156,14 @@ public class Technology implements ITechnology {
 
     @Override
     public boolean isRoot() {
-        return !hasParent()
-                || !getRegistryName().getPath().substring(0, getRegistryName().getPath().indexOf('/')).equals(parent
-                .getRegistryName().getPath().substring(0, parent.getRegistryName().getPath().indexOf('/')));
+        if (this.hasChapter()){
+            return !hasParent();
+        }else {
+            return !hasParent()
+                    || !getRegistryName().getPath().substring(0, getRegistryName().getPath().indexOf('/')).equals(parent
+                    .getRegistryName().getPath().substring(0, parent.getRegistryName().getPath().indexOf('/')));
+        }
+
     }
 
     @Override
@@ -385,6 +395,9 @@ public class Technology implements ITechnology {
         return stage;
     }
 
+    public String getSubtilte() {
+        return subtilte;
+    }
     private boolean unlockedStage(EntityPlayer player) {
         return stage == null || (!RFTGU.GAME_STAGES_LOADED || CompatGameStages.hasGameStage(player, stage));
     }
@@ -402,9 +415,25 @@ public class Technology implements ITechnology {
         return id;
     }
 
+    @Override
+    public boolean hasChapter() {
+        return chapter != null;
+    }
+
+    @Override
+    public boolean isChapterEqual(Chapter chapter){
+        return this.chapter.equals(chapter);
+    }
+
+    @Override
+    public Chapter getChapter() {
+        return chapter;
+    }
+
     public static class Builder {
 
         private final ResourceLocation parentId;
+        private final ResourceLocation chapterId;
         private final DisplayInfo display;
         private final AdvancementRewards rewards;
         private final Map<String, Criterion> criteria;
@@ -420,10 +449,13 @@ public class Technology implements ITechnology {
         private final boolean copy;
 
         private Technology parent;
+        private Chapter chapter;
+        private String subtilte;
 
         private Builder(@Nullable ResourceLocation parent, DisplayInfo display, AdvancementRewards rewards,
                         Map<String, Criterion> criteria, String[][] requirements, boolean start, boolean copy,
-                        @Nullable JsonArray unlock, @Nullable JsonObject idea, @Nullable JsonObject research, String stage) {
+                        @Nullable JsonArray unlock, @Nullable JsonObject idea, @Nullable JsonObject research, String stage,
+                        @Nullable ResourceLocation chapter) {
             this.parentId = parent;
             this.display = display;
             this.rewards = rewards;
@@ -435,6 +467,8 @@ public class Technology implements ITechnology {
             this.idea = idea;
             this.research = research;
             this.stage = stage;
+            this.chapterId = chapter;
+            this.subtilte = subtilte;
         }
 
         public boolean resolveParent(Map<ResourceLocation, Technology> map) {
@@ -442,6 +476,13 @@ public class Technology implements ITechnology {
                 return true;
             parent = map.get(parentId);
             return parent != null;
+        }
+
+        public boolean resolveChapter(Map<ResourceLocation, Chapter> map) {
+            if (chapterId == null)
+                return true;
+            chapter = map.get(chapterId);
+            return chapter != null;
         }
 
         public Technology build(ResourceLocation location, JsonContextPublic context) {
@@ -455,7 +496,7 @@ public class Technology implements ITechnology {
                     : TechnologyManager.INSTANCE.getPuzzle(this.research, context, location);
 
             Technology r = new Technology(location, parent, display, rewards, criteria, requirements, start, copy,
-                    unlock, idea, research, stage);
+                    unlock, idea, research, stage, chapter, subtilte);
             if (research != null)
                 research.setTechnology(r);
             return r;
@@ -535,12 +576,16 @@ public class Technology implements ITechnology {
             JsonObject research = json.has("research") ? JsonUtils.getJsonObject(json, "research") : null;
 
             String stage = JsonUtils.getString(json, "gamestage", null);
+            String subtilte = JsonUtils.getString(json, "subtilte", null);
+
+            ResourceLocation chapter = json.has("chapter") ? new ResourceLocation(JsonUtils.getString(json, "chapter"))
+                    : null;
 
             boolean start = JsonUtils.getBoolean(json, "start", false);
             boolean copy = JsonUtils.getBoolean(json, "copy", true);
 
             return new Builder(parent, display, rewards, criteria, requirements, start, copy, unlock, idea, research,
-                    stage);
+                    stage, chapter);
         }
 
     }

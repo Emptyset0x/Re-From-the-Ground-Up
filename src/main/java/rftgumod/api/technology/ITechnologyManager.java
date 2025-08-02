@@ -7,6 +7,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import rftgumod.api.technology.recipe.IResearchRecipe;
 import rftgumod.api.technology.unlock.IUnlock;
+import rftgumod.common.technology.Chapter;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -73,6 +74,8 @@ public interface ITechnologyManager {
 
     boolean contains(ITechnology value);
 
+    boolean contains(Chapter chapter);
+
     ITechnology getTechnology(ResourceLocation key);
 
     Collection<ITechnology> getTechnologies();
@@ -112,4 +115,7 @@ public interface ITechnologyManager {
 
     void registerPuzzle(ResourceLocation name, IResearchRecipe.Factory<?> factory);
 
+    Chapter getChapter(ResourceLocation name);
+
+    void getAllChapters(Set<Chapter> chapters);
 }

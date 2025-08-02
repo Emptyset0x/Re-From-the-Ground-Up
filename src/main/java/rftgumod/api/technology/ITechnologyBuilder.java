@@ -33,6 +33,10 @@ public interface ITechnologyBuilder {
 
     ITechnologyBuilder setGameStage(String stage);
 
+    ITechnologyBuilder setChapter(ResourceLocation chapter);
+
+    ITechnologyBuilder setSubtilte(String subtilte);
+
     /**
      * If this {@code TechnologyBuilder} was built from an existing
      * {@code Technology}, that {@code Technology} will be modified.

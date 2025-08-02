@@ -31,6 +31,7 @@ import rftgumod.api.technology.unlock.IUnlock;
 import rftgumod.api.technology.unlock.UnlockCompound;
 import rftgumod.api.technology.unlock.UnlockRecipe;
 import rftgumod.api.util.JsonContextPublic;
+import rftgumod.api.util.predicate.BlockPredicate;
 import rftgumod.common.config.RFTGUConfig;
 import rftgumod.common.packet.PacketDispatcher;
 import rftgumod.common.packet.client.TechnologyMessage;
@@ -62,6 +63,7 @@ public class TechnologyManager implements ITechnologyManager, Iterable<Technolog
     private final Map<UUID, Map<Technology, TechnologyProgress>> progress = new HashMap<>();
 
     private final Map<ResourceLocation, Technology> technologies = new LinkedHashMap<>();
+    private final Map<ResourceLocation, Chapter> chapters = new HashMap<>();
     private final Collection<Technology> roots = new SubCollection<>(technologies.values(), Technology::isRoot);
     private final Collection<Technology> start = new SubCollection<>(technologies.values(),
             Technology::researchedAtStart);
@@ -157,6 +159,10 @@ public class TechnologyManager implements ITechnologyManager, Iterable<Technolog
 
     public Collection<Technology> getRoots() {
         return roots;
+    }
+
+    public Collection<Chapter> getChapters() {
+        return chapters.values();
     }
 
     public Collection<Technology> getStart() {
@@ -302,47 +308,100 @@ public class TechnologyManager implements ITechnologyManager, Iterable<Technolog
         }
 
         Map<JsonContextPublic, Map<ResourceLocation, Technology.Builder>> builders = new HashMap<>();
+        Map<JsonContextPublic, Map<ResourceLocation, Chapter.Builder>> builders2 = new HashMap<>();
         Map<ResourceLocation, Technology> technologies = new LinkedHashMap<>();
+        Map<ResourceLocation, Chapter> chapters = new LinkedHashMap<>();
 
         for (Map.Entry<JsonContextPublic, Map<ResourceLocation, String>> domain : json.entrySet()) {
             Map<ResourceLocation, Technology.Builder> map = new HashMap<>();
+            Map<ResourceLocation, Chapter.Builder> map2 = new HashMap<>();
             for (Map.Entry<ResourceLocation, String> file : domain.getValue().entrySet()) {
-                try {
-                    map.put(file.getKey(), RFTGU.GSON.fromJson(file.getValue(), Technology.Builder.class));
-                } catch (JsonParseException e) {
-                    removeFromCache(file.getKey());
-                    error("Couldn't load technology " + file.getKey(), e);
+                if (!file.getKey().getPath().contains("chapter")){
+                    try {
+                        map.put(file.getKey(), RFTGU.GSON.fromJson(file.getValue(), Technology.Builder.class));
+                    } catch (JsonParseException e) {
+                        removeFromCache(file.getKey());
+                        error("Couldn't load technology " + file.getKey(), e);
+                    }
+                }
+                if (file.getKey().getPath().contains("chapter")){
+                    try {
+                        map2.put(file.getKey(), RFTGU.GSON.fromJson(file.getValue(), Chapter.Builder.class));
+                    } catch (JsonParseException e) {
+                        removeFromCache(file.getKey());
+                        error("Couldn't load chapter " + file.getKey(), e);
+                    }
                 }
             }
             builders.put(domain.getKey(), map);
+            builders2.put(domain.getKey(), map2);
+
         }
 
         boolean load = true;
-        while (!builders.isEmpty() && load) {
+
+        while (!builders2.isEmpty()&& load) {
             load = false;
+
+            for (Map.Entry<JsonContextPublic, Map<ResourceLocation, Chapter.Builder>> domain : builders2.entrySet()) {
+                Iterator<Map.Entry<ResourceLocation, Chapter.Builder>> iterator = domain.getValue().entrySet()
+                        .iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<ResourceLocation, Chapter.Builder> entry = iterator.next();
+
+
+                        try {
+                            Chapter chapter = entry.getValue().build(entry.getKey(), domain.getKey());
+                            chapters.put(chapter.getRegistryName(), chapter);
+                            load = true;
+                        } catch (JsonParseException e) {
+                            removeFromCache(entry.getKey());
+                            error("Couldn't load chapter " + entry.getKey(), e);
+                        }
+
+                        iterator.remove();
+
+                }
+            }
+
+            if (!load) {
+                for (Map.Entry<JsonContextPublic, Map<ResourceLocation, Chapter.Builder>> domain : builders2
+                        .entrySet()) {
+                    for (Map.Entry<ResourceLocation, Chapter.Builder> entry : domain.getValue().entrySet()) {
+                        removeFromCache(entry.getKey());
+                        error("Couldn't load chapter " + entry.getKey(),
+                                "Parent couldn't be loaded or doesn't exist");
+                    }
+                }
+            }
+        }
+        boolean load2 = true;
+        while (!builders.isEmpty() && load2) {
+            load2 = false;
 
             for (Map.Entry<JsonContextPublic, Map<ResourceLocation, Technology.Builder>> domain : builders.entrySet()) {
                 Iterator<Map.Entry<ResourceLocation, Technology.Builder>> iterator = domain.getValue().entrySet()
                         .iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<ResourceLocation, Technology.Builder> entry = iterator.next();
+                    if (entry.getValue().resolveChapter(chapters)) {
+                        if (entry.getValue().resolveParent(technologies)) {
+                            try {
+                                Technology technology = entry.getValue().build(entry.getKey(), domain.getKey());
+                                technologies.put(technology.getRegistryName(), technology);
+                                load2 = true;
+                            } catch (JsonParseException e) {
+                                removeFromCache(entry.getKey());
+                                error("Couldn't load technology " + entry.getKey(), e);
+                            }
 
-                    if (entry.getValue().resolveParent(technologies)) {
-                        try {
-                            Technology technology = entry.getValue().build(entry.getKey(), domain.getKey());
-                            technologies.put(technology.getRegistryName(), technology);
-                            load = true;
-                        } catch (JsonParseException e) {
-                            removeFromCache(entry.getKey());
-                            error("Couldn't load technology " + entry.getKey(), e);
+                            iterator.remove();
                         }
-
-                        iterator.remove();
                     }
                 }
             }
 
-            if (!load) {
+            if (!load2) {
                 for (Map.Entry<JsonContextPublic, Map<ResourceLocation, Technology.Builder>> domain : builders
                         .entrySet()) {
                     for (Map.Entry<ResourceLocation, Technology.Builder> entry : domain.getValue().entrySet()) {
@@ -355,9 +414,12 @@ public class TechnologyManager implements ITechnologyManager, Iterable<Technolog
         }
 
         registerAll(technologies.values().toArray(new Technology[technologies.size()]));
+        registerAll(chapters.values().toArray(new Chapter[chapters.size()]));
 
         int size = this.technologies.size();
         info("Loaded " + size + " technolog" + (size != 1 ? "ies" : "y"));
+        info("Loaded " +  chapters.size() + " chapter" + (chapters.size() != 1 ? "s" : ""));
+
     }
 
     private static void printToPlayer(String string) {
@@ -401,6 +463,20 @@ public class TechnologyManager implements ITechnologyManager, Iterable<Technolog
             throw new IllegalArgumentException("Technology instance is of unexpected class");
     }
 
+    public void register(Chapter value) {
+        if (value instanceof Chapter) {
+            _register(value);
+        } else
+            throw new IllegalArgumentException("Technology instance is of unexpected class");
+    }
+
+    private boolean _register(Chapter value) {
+        if (value == null || value.getRegistryName() == null)
+            throw new NullPointerException("Tried to register a chapter that is null or has a null registry name");
+
+        chapters.put(value.getRegistryName(), value);
+        return true;
+    }
     private boolean _register(Technology value) {
         if (value == null || value.getRegistryName() == null)
             throw new NullPointerException("Tried to register a technology that is null or has a null registry name");
@@ -423,6 +499,13 @@ public class TechnologyManager implements ITechnologyManager, Iterable<Technolog
             register(tech);
     }
 
+    public void registerAll(Chapter... values) {
+        for (Chapter chapter : values)
+            register(chapter);
+    }
+
+
+
     @Override
     public boolean contains(ResourceLocation key) {
         return technologies.containsKey(key);
@@ -433,10 +516,20 @@ public class TechnologyManager implements ITechnologyManager, Iterable<Technolog
         return technologies.containsValue(value);
     }
 
+    @Override
+    public boolean contains(Chapter value) {
+        return technologies.containsValue(value);
+    }
+
     @Nullable
     @Override
     public Technology getTechnology(ResourceLocation key) {
         return technologies.get(key);
+    }
+
+    @Override
+    public Chapter getChapter(ResourceLocation key) {
+        return technologies.get(key).getChapter();
     }
 
     @Override
@@ -482,6 +575,13 @@ public class TechnologyManager implements ITechnologyManager, Iterable<Technolog
     @Override
     public Iterator<Technology> iterator() {
         return technologies.values().iterator();
+    }
+
+    @Override
+    public void getAllChapters(Set<Chapter> chapters) {
+        for (Chapter chapter : this.chapters.values()){
+            chapters.add(chapter);
+        }
     }
 
     public enum GUI {

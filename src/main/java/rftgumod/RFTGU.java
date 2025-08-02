@@ -35,6 +35,7 @@ import rftgumod.common.event.EventHandler;
 import rftgumod.common.packet.PacketDispatcher;
 import rftgumod.common.proxy.ProxyCommon;
 import rftgumod.common.technology.CapabilityTechnology;
+import rftgumod.common.technology.Chapter;
 import rftgumod.common.technology.Technology;
 import rftgumod.common.technology.TechnologyManager;
 import rftgumod.common.tileentity.TileEntityIdeaTable;
@@ -48,6 +49,7 @@ public class RFTGU {
 
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Technology.Builder.class, new Technology.Deserializer())
+            .registerTypeAdapter(Chapter.Builder.class, new Chapter.Deserializer())
             .registerTypeAdapter(AdvancementRewards.class, new AdvancementRewards.Deserializer())
             .registerTypeHierarchyAdapter(ITextComponent.class, new ITextComponent.Serializer())
             .registerTypeHierarchyAdapter(Style.class, new Style.Serializer())
@@ -102,6 +104,7 @@ public class RFTGU {
         StackUtils.INSTANCE.registerItemPredicate(new ResourceLocation(MODID, "mod"), new ItemMod.Factory());
 
         TechnologyManager.INSTANCE.registerPuzzle(new ResourceLocation(MODID, "match"), new ResearchMatch.Factory());
+
         TechnologyManager.INSTANCE.registerPuzzle(new ResourceLocation(MODID, "connect"),
                 new ResearchConnect.Factory());
 

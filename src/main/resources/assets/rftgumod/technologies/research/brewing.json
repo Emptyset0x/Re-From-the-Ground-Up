@@ -26,7 +26,7 @@
       }
     },
     "inspect": {
-      "trigger": "ftgumod:block_inspected",
+      "trigger": "rftgumod:block_inspected",
       "conditions": {
         "block": "minecraft:cauldron",
         "location": {
@@ -48,7 +48,7 @@
       [
         "minecraft:potion",
         {
-          "type": "ftgumod:fluid",
+          "type": "rftgumod:fluid",
           "fluid": "water",
           "count": 250
         }
@@ -83,7 +83,7 @@
         "item": [
           "minecraft:potion",
           {
-            "type": "ftgumod:fluid",
+            "type": "rftgumod:fluid",
             "fluid": "water",
             "count": 250
           }
