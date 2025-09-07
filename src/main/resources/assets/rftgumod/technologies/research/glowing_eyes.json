@@ -33,6 +33,7 @@
       "minecraft:blaze_powder"
     ]
   },
+  "chapter": "rftgumod:chapter/four",
   "unlock": [
     "minecraft:ender_eye"
   ]

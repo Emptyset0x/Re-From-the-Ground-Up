@@ -36,6 +36,7 @@
       "ore": "dustRedstone"
     }
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     "minecraft:hopper",
     "minecraft:golden_rail",

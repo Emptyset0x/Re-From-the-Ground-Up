@@ -57,6 +57,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     "minecraft:wooden_hoe",
     "minecraft:stone_hoe",

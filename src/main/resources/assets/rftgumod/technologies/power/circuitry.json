@@ -91,6 +91,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/two",
   "unlock": [
     "minecraft:repeater",
     "minecraft:comparator",

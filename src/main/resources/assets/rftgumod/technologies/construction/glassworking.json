@@ -24,6 +24,7 @@
       }
     ]
   },
+  "chapter": "rftgumod:chapter/three",
   "unlock": [
     "minecraft:stained_glass",
     "minecraft:glass_pane",

@@ -66,6 +66,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     "minecraft:stone_sword",
     "minecraft:stone_shovel",

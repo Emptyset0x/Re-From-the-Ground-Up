@@ -26,6 +26,7 @@
       }
     ]
   },
+  "chapter": "rftgumod:chapter/four",
   "unlock": [
     "minecraft:book",
     "minecraft:writable_book",

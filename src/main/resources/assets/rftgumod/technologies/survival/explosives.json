@@ -25,6 +25,7 @@
       }
     ]
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     "minecraft:tnt",
     "minecraft:tnt_minecart",

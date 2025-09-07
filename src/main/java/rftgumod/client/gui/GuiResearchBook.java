@@ -92,8 +92,19 @@ public class GuiResearchBook extends GuiScreen {
         imageWidth = 256;
         imageHeight = 202;
 
+        if (selectedChapter == null || !TechnologyManager.INSTANCE.contains(selectedChapter)) {
+            for (Chapter chapter : TechnologyManager.INSTANCE.getChapters()) {
+                for (Technology root : TechnologyManager.INSTANCE.getRoots().stream().filter(r -> r.isChapterEqual(chapter)).collect(Collectors.toList())) {
+                    if (root.canResearchIgnoreResearched(player)) {
+                        selectedChapter = chapter;
+                        break;
+                    }
+                }
+            }
+        }
+
         if (root == null || !TechnologyManager.INSTANCE.contains(root) || !root.canResearchIgnoreResearched(player)) {
-            for (Technology technology : TechnologyManager.INSTANCE.getRoots()) {
+            for (Technology technology : TechnologyManager.INSTANCE.getRoots().stream().filter(r -> r.isChapterEqual(selectedChapter)).collect(Collectors.toList())) {
                 if (technology.canResearchIgnoreResearched(player)) {
                     root = technology;
                     break;
@@ -110,13 +121,16 @@ public class GuiResearchBook extends GuiScreen {
             showResearchTree = true;
         }
 
+
         xScrollP = xScrollTarget = xScrollO.get(root.getRegistryName());
         yScrollP = yScrollTarget = yScrollO.get(root.getRegistryName());
 
         buttonList.clear();
         if (showResearchTree) {
             Set<Technology> tree = new HashSet<>();
-            root.getChildren(tree, true);
+            for  (Technology technology : TechnologyManager.INSTANCE.getRoots().stream().filter(r -> r.isChapterEqual(selectedChapter)).collect(Collectors.toList())) {
+                technology.getChildren(tree, true);
+            }
 
             x_min = (int) root.getDisplayInfo().getX();
             y_min = (int) root.getDisplayInfo().getY();
@@ -183,25 +197,26 @@ public class GuiResearchBook extends GuiScreen {
             if (showResearchTree) {
                 Technology first = null;
                 boolean next = false;
-                for (Chapter chapter : TechnologyManager.INSTANCE.getChapters()) {
-                    for (Technology technology : TechnologyManager.INSTANCE.getRoots()){
-                        if (technology.isChapterEqual(chapter)) {
-                            if (technology.canResearchIgnoreResearched(player)) {
-                                if (next) {
-                                    next = false;
-                                    root = technology;
-                                    break;
-                                }
-                                if (first == null)
-                                    first = technology;
+                for (Chapter chapter : TechnologyManager.INSTANCE.getChapters()){
+                    for (Technology technology : TechnologyManager.INSTANCE.getRoots().stream().filter(r -> r.isChapterEqual(chapter)).collect(Collectors.toList())) {
+                        if (technology.canResearchIgnoreResearched(player)) {
+                            if (next){
+                                next = false;
+                                selectedChapter = chapter;
+                                root = technology;
+                                break;
                             }
-                            if (technology == root)
-                                next = true;
+                            if (first == null)
+                                first = technology;
                         }
+                        if (technology == root)
+                            next = true;
+                    }
+                    if (next) {
+                        root = first;
+                        selectedChapter = first.getChapter();
                     }
                 }
-                if (next)
-                    root = first;
                 initGui();
             } else {
                 PacketDispatcher.sendToServer(new CopyTechMessage(selected));
@@ -385,7 +400,10 @@ public class GuiResearchBook extends GuiScreen {
                 interpolatedYScroll = y_max - 1;
 
             Set<Technology> tech = new HashSet<>();
-            root.getChildren(tech, true);
+            for  (Technology technology : TechnologyManager.INSTANCE.getRoots().stream().filter(r -> r.isChapterEqual(selectedChapter)).collect(Collectors.toList())) {
+                technology.getChildren(tech, true);
+            }
+
 
             if (tech != null) {
                 try {
@@ -593,7 +611,7 @@ public class GuiResearchBook extends GuiScreen {
         GlStateManager.popMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(WINDOW);
-//        drawTexturedModalRect(k, l, 0, 0, imageWidth, imageHeight);
+        // drawTexturedModalRect(k, l, 0, 0, imageWidth, imageHeight);
 
         this.drawTexturedModalRect(left, top, 0, 0, CORNER_SIZE, CORNER_SIZE);
         // Top side
@@ -610,14 +628,19 @@ public class GuiResearchBook extends GuiScreen {
         renderRepeating(this, left + CORNER_SIZE, bottom - CORNER_SIZE, width - CORNER_SIZE - 2*SIDE - CORNER_SIZE, CORNER_SIZE, CORNER_SIZE, HEIGHT - CORNER_SIZE, WIDTH - CORNER_SIZE - CORNER_SIZE, CORNER_SIZE);
         // Bottom right corner
         this.drawTexturedModalRect(right - CORNER_SIZE, bottom - CORNER_SIZE, WIDTH - CORNER_SIZE, HEIGHT - CORNER_SIZE, CORNER_SIZE, CORNER_SIZE);
-
-        type = BetterTabType.getTabType(right - left, bottom - top, (int)TechnologyManager.INSTANCE.getRoots().stream().filter(t -> t.canResearchIgnoreResearched(player)).count() );
-        if ((int)TechnologyManager.INSTANCE.getRoots().stream().filter(t -> t.canResearchIgnoreResearched(player)).count() > 1 ) {
+        int count = 0;
+        for (Chapter chapter : TechnologyManager.INSTANCE.getChapters()) {
+            if (chapter.hasCanResearchRoots(player)){
+                count++;
+            }
+        }
+        type = BetterTabType.getTabType(right - left, bottom - top, count );
+        if (count > 1 ) {
             mc.getTextureManager().bindTexture(TABS);
             int index = 0;
-            for (Technology tech : TechnologyManager.INSTANCE.getRoots()){
-                if (tech.canResearchIgnoreResearched(player)) {
-                    type.draw(this, left, top, right - left, bottom - top, tech == selected , index);
+            for (Chapter chapter : TechnologyManager.INSTANCE.getChapters()){
+                if (chapter.hasCanResearchRoots(player)) {
+                    type.draw(this, left, top, right - left, bottom - top, chapter == selectedChapter , index);
                     index++;
                 }
             }
@@ -625,9 +648,9 @@ public class GuiResearchBook extends GuiScreen {
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             RenderHelper.enableGUIStandardItemLighting();
             int iconIndex = 0;
-            for (Technology tech : TechnologyManager.INSTANCE.getRoots()) {
-                if (tech.canResearchIgnoreResearched(player)) {
-                    type.drawIcon(left, top, right - left, bottom - top, iconIndex, mc.getRenderItem(), tech.getDisplayInfo().getIcon() );
+            for (Chapter chapter : TechnologyManager.INSTANCE.getChapters()) {
+                if (chapter.hasCanResearchRoots(player)) {
+                    type.drawIcon(left, top, right - left, bottom - top, iconIndex, mc.getRenderItem(), chapter.getDisplayInfo().getIcon() );
                     iconIndex++;
                 }
             }

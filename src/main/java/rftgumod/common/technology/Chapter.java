@@ -2,6 +2,7 @@ package rftgumod.common.technology;
 
 import com.google.gson.*;
 import net.minecraft.advancements.DisplayInfo;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import rftgumod.api.util.JsonContextPublic;
@@ -9,6 +10,7 @@ import rftgumod.api.util.JsonContextPublic;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Chapter {
 
@@ -31,6 +33,15 @@ public class Chapter {
         return display;
     }
 
+    public boolean hasCanResearchRoots(EntityPlayer player) {
+        boolean flag = false;
+        for (Technology technology : TechnologyManager.INSTANCE.getRoots().stream().filter(r -> r.isChapterEqual(this)).collect(Collectors.toList())) {
+            if (technology.canResearchIgnoreResearched(player)){
+                flag = true;
+            }
+        }
+        return flag;
+    }
     public static class Builder {
 
         private final DisplayInfo display;

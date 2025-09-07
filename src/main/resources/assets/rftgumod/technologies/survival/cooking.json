@@ -67,6 +67,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     "minecraft:sugar",
     "minecraft:mushroom_stew",

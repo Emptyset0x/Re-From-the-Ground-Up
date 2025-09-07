@@ -28,6 +28,7 @@
       "ore": "ingotIron"
     }
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     "minecraft:iron_helmet",
     "minecraft:iron_chestplate",

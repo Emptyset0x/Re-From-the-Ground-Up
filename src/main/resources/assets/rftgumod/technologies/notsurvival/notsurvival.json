@@ -4,14 +4,14 @@
       "item": "minecraft:crafting_table"
     },
     "title": {
-      "translate": "technology.survival.name"
+      "translate": "technology.notsurvival.name"
     },
     "description": {
-      "translate": "technology.survival.desc"
+      "translate": "technology.notsurvival.desc"
     },
     "background": "minecraft:textures/blocks/dirt.png",
     "x": 0,
-    "y": 0
+    "y": 10
   },
   "start": true,
   "chapter": "rftgumod:chapter/one",

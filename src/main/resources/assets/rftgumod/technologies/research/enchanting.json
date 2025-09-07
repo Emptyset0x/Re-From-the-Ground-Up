@@ -38,6 +38,7 @@
     "left": "minecraft:book",
     "right": "minecraft:iron_sword"
   },
+  "chapter": "rftgumod:chapter/four",
   "unlock": [
     "minecraft:enchanting_table",
     "minecraft:spectral_arrow"

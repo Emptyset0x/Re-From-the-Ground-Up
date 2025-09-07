@@ -78,6 +78,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/four",
   "unlock": [
     "minecraft:end_crystal",
     "minecraft:ender_chest",

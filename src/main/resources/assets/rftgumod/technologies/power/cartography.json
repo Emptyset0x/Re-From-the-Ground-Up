@@ -36,6 +36,7 @@
       ]
     ]
   },
+  "chapter": "rftgumod:chapter/two",
   "unlock": [
     "minecraft:compass",
     "minecraft:clock",

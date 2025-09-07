@@ -15,6 +15,7 @@
   },
   "start": true,
   "parent": "rftgumod:survival/survival",
+  "chapter": "rftgumod:chapter/four",
   "unlock": [
     {
       "type": "forge:ore_dict",

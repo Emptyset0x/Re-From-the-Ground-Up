@@ -103,6 +103,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/four",
   "unlock": [
     "minecraft:brewing_stand",
     "minecraft:cauldron",

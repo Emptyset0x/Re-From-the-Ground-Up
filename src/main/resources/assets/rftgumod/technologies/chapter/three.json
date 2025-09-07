@@ -1,0 +1,14 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:enchanting_table"
+    },
+    "title": {
+      "translate": "chapter.three.name"
+    },
+    "description": {
+      "translate": "chapter.three.desc"
+    },
+    "background": "minecraft:textures/blocks/dirt.png"
+  }
+}

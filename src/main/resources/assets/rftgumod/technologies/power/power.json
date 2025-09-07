@@ -82,6 +82,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/two",
   "unlock": [
     "minecraft:redstone_torch",
     "minecraft:tripwire_hook",

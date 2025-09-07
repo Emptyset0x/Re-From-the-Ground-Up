@@ -78,6 +78,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     "minecraft:minecart",
     "minecraft:furnace_minecart",

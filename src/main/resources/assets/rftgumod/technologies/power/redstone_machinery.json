@@ -81,6 +81,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/two",
   "unlock": [
     "minecraft:dispenser",
     "minecraft:dropper",

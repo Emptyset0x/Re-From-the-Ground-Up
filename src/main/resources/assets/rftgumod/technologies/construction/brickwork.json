@@ -28,6 +28,7 @@
     "left": "minecraft:hardened_clay",
     "right": "minecraft:brick_block"
   },
+  "chapter": "rftgumod:chapter/three",
   "unlock": [
     "minecraft:brick_block",
     {

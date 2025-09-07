@@ -1,0 +1,14 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:book"
+    },
+    "title": {
+      "translate": "chapter.four.name"
+    },
+    "description": {
+      "translate": "chapter.four.desc"
+    },
+    "background": "minecraft:textures/blocks/dirt.png"
+  }
+}

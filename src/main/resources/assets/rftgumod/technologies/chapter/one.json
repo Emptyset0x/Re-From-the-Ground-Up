@@ -1,0 +1,14 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:crafting_table"
+    },
+    "title": {
+      "translate": "chapter.one.name"
+    },
+    "description": {
+      "translate": "chapter.one.desc"
+    },
+    "background": "minecraft:textures/blocks/dirt.png"
+  }
+}

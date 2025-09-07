@@ -49,6 +49,7 @@
       }
     }
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     {
       "item": "minecraft:furnace"

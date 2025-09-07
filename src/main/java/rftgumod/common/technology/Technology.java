@@ -156,13 +156,9 @@ public class Technology implements ITechnology {
 
     @Override
     public boolean isRoot() {
-        if (this.hasChapter()){
-            return !hasParent();
-        }else {
             return !hasParent()
                     || !getRegistryName().getPath().substring(0, getRegistryName().getPath().indexOf('/')).equals(parent
                     .getRegistryName().getPath().substring(0, parent.getRegistryName().getPath().indexOf('/')));
-        }
 
     }
 

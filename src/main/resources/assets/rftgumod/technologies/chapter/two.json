@@ -1,0 +1,14 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:furnace"
+    },
+    "title": {
+      "translate": "chapter.two.name"
+    },
+    "description": {
+      "translate": "chapter.two.desc"
+    },
+    "background": "minecraft:textures/blocks/dirt.png"
+  }
+}

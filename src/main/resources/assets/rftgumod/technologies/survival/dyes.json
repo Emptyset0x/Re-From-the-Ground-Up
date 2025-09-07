@@ -36,6 +36,7 @@
       "data": 0
     }
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     {
       "item": "minecraft:dye",

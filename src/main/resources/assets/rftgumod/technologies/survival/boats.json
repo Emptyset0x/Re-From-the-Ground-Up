@@ -19,6 +19,7 @@
       "minecraft:bowl"
     ]
   },
+  "chapter": "rftgumod:chapter/one",
   "unlock": [
     "#boat"
   ]

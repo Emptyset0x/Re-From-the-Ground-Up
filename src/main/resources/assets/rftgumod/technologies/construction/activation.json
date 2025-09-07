@@ -39,6 +39,7 @@
     "left": "minecraft:iron_door",
     "right": "minecraft:lever"
   },
+  "chapter": "rftgumod:chapter/three",
   "unlock": [
     "minecraft:wooden_button",
     "minecraft:wooden_pressure_plate",
