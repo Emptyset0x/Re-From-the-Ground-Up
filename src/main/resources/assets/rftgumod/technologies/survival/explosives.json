@@ -12,6 +12,7 @@
     "x": 6,
     "y": 3
   },
+  "subtitle": "technology.explosives.desc",
   "parent": "rftgumod:survival/refinement",
   "idea": {
     "amount": 3,

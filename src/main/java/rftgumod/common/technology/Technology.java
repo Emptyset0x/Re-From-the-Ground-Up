@@ -54,7 +54,7 @@ public class Technology implements ITechnology {
     IIdeaRecipe idea;
     IResearchRecipe research;
 
-    String subtilte;
+    ITextComponent subtilte;
     String stage;
 
     boolean start;
@@ -63,7 +63,7 @@ public class Technology implements ITechnology {
     Technology(ResourceLocation id, @Nullable Technology parent, DisplayInfo display, AdvancementRewards rewards,
                Map<String, Criterion> criteria, String[][] requirements, boolean start, boolean copy,
                @Nullable NonNullList<IUnlock> unlock, @Nullable IIdeaRecipe idea, @Nullable IResearchRecipe research,
-               String stage, Chapter chapter, String subtilte) {
+               String stage, Chapter chapter, ITextComponent subtilte) {
         this.id = id;
         this.parent = parent;
         this.display = display;
@@ -391,7 +391,7 @@ public class Technology implements ITechnology {
         return stage;
     }
 
-    public String getSubtilte() {
+    public ITextComponent getSubtilte() {
         return subtilte;
     }
     private boolean unlockedStage(EntityPlayer player) {
@@ -414,6 +414,11 @@ public class Technology implements ITechnology {
     @Override
     public boolean hasChapter() {
         return chapter != null;
+    }
+
+    @Override
+    public boolean hasSubtilte() {
+        return subtilte != null;
     }
 
     @Override
@@ -446,12 +451,12 @@ public class Technology implements ITechnology {
 
         private Technology parent;
         private Chapter chapter;
-        private String subtilte;
+        private ITextComponent subtitle;
 
         private Builder(@Nullable ResourceLocation parent, DisplayInfo display, AdvancementRewards rewards,
                         Map<String, Criterion> criteria, String[][] requirements, boolean start, boolean copy,
                         @Nullable JsonArray unlock, @Nullable JsonObject idea, @Nullable JsonObject research, String stage,
-                        @Nullable ResourceLocation chapter) {
+                        @Nullable ResourceLocation chapter, @Nullable ITextComponent subtitle) {
             this.parentId = parent;
             this.display = display;
             this.rewards = rewards;
@@ -464,7 +469,7 @@ public class Technology implements ITechnology {
             this.research = research;
             this.stage = stage;
             this.chapterId = chapter;
-            this.subtilte = subtilte;
+            this.subtitle = subtitle;
         }
 
         public boolean resolveParent(Map<ResourceLocation, Technology> map) {
@@ -492,7 +497,7 @@ public class Technology implements ITechnology {
                     : TechnologyManager.INSTANCE.getPuzzle(this.research, context, location);
 
             Technology r = new Technology(location, parent, display, rewards, criteria, requirements, start, copy,
-                    unlock, idea, research, stage, chapter, subtilte);
+                    unlock, idea, research, stage, chapter, subtitle);
             if (research != null)
                 research.setTechnology(r);
             return r;
@@ -572,7 +577,7 @@ public class Technology implements ITechnology {
             JsonObject research = json.has("research") ? JsonUtils.getJsonObject(json, "research") : null;
 
             String stage = JsonUtils.getString(json, "gamestage", null);
-            String subtilte = JsonUtils.getString(json, "subtilte", null);
+            ITextComponent subtitle = json.has("subtitle") ? new TextComponentTranslation(JsonUtils.getString(json, "subtitle")) : null;
 
             ResourceLocation chapter = json.has("chapter") ? new ResourceLocation(JsonUtils.getString(json, "chapter"))
                     : null;
@@ -581,7 +586,7 @@ public class Technology implements ITechnology {
             boolean copy = JsonUtils.getBoolean(json, "copy", true);
 
             return new Builder(parent, display, rewards, criteria, requirements, start, copy, unlock, idea, research,
-                    stage, chapter);
+                    stage, chapter, subtitle);
         }
 
     }

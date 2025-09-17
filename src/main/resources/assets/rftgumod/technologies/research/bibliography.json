@@ -12,6 +12,7 @@
     "x": 2,
     "y": 0
   },
+  "subtitle": "technology.bibliography.desc",
   "parent": "rftgumod:research/research",
   "idea": {
     "amount": 2,

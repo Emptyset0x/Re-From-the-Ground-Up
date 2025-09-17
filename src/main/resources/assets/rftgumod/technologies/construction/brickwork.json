@@ -12,6 +12,7 @@
     "x": 4,
     "y": 1
   },
+  "subtitle": "technology.brickwork.desc",
   "parent": "rftgumod:construction/stonemasonry",
   "idea": {
     "amount": 2,

@@ -12,6 +12,7 @@
     "x": 6,
     "y": 0
   },
+  "subtitle": "technology.glowing_eyes.desc",
   "parent": "rftgumod:research/enchanting",
   "criteria": {
     "enderman": {

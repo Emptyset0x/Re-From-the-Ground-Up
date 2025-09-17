@@ -12,6 +12,7 @@
     "x": 8,
     "y": 1
   },
+  "subtitle": "technology.purpur.desc",
   "parent": "rftgumod:construction/quartz",
   "criteria": {
     "city": {

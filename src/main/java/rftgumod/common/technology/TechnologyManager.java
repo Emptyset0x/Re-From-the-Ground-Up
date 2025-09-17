@@ -13,6 +13,7 @@ import net.minecraft.stats.RecipeBookServer;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -530,6 +531,10 @@ public class TechnologyManager implements ITechnologyManager, Iterable<Technolog
     @Override
     public Chapter getChapter(ResourceLocation key) {
         return technologies.get(key).getChapter();
+    }
+
+    public ITextComponent getSubtilte(ResourceLocation key) {
+        return technologies.get(key).getSubtilte();
     }
 
     @Override

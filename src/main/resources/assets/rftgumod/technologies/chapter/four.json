@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "minecraft:book"
+      "item": "rftgumod:parchment_idea"
     },
     "title": {
       "translate": "chapter.four.name"
@@ -9,6 +9,6 @@
     "description": {
       "translate": "chapter.four.desc"
     },
-    "background": "minecraft:textures/blocks/dirt.png"
+    "background": "minecraft:textures/blocks/iron_block.png"
   }
 }

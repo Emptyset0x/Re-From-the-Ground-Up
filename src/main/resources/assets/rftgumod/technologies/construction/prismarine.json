@@ -12,6 +12,7 @@
     "x": 6,
     "y": 0
   },
+  "subtitle": "technology.prismarine.desc",
   "parent": "rftgumod:construction/glassworking",
   "criteria": {
     "monument": {

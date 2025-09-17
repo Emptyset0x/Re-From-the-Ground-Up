@@ -12,6 +12,7 @@
     "x": 2,
     "y": 1
   },
+  "subtitle": "technology.brewing.desc",
   "parent": "rftgumod:research/research",
   "criteria": {
     "effect": {

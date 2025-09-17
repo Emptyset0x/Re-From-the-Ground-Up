@@ -13,6 +13,7 @@
     "x": 6,
     "y": 2
   },
+  "subtitle": "technology.smithing.desc",
   "parent": "rftgumod:survival/refinement",
   "idea": {
     "amount": 1,

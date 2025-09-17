@@ -12,6 +12,7 @@
     "x": 4,
     "y": 1
   },
+  "subtitle": "technology.metal_armor.desc",
   "parent": "rftgumod:survival/defense",
   "idea": {
     "amount": 2,

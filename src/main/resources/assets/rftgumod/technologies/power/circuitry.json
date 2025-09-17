@@ -12,6 +12,7 @@
     "x": 2,
     "y": 0
   },
+  "subtitle": "technology.circuitry.desc",
   "parent": "rftgumod:power/power",
   "idea": {
     "amount": 2,

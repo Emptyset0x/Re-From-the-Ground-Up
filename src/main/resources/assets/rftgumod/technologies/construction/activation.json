@@ -12,6 +12,7 @@
     "x": 4,
     "y": 2
   },
+  "subtitle": "technology.activation.desc",
   "parent": "rftgumod:construction/stonemasonry",
   "idea": {
     "amount": 2,

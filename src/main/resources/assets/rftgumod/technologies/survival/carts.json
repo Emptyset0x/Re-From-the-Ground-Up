@@ -12,6 +12,7 @@
     "x": 6,
     "y": 0
   },
+  "subtitle": "technology.carts.desc",
   "parent": "rftgumod:survival/boats",
   "idea": {
     "amount": 2,

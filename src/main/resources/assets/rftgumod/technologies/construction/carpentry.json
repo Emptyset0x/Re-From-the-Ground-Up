@@ -13,6 +13,7 @@
     "x": 2,
     "y": 0
   },
+  "subtitle": "technology.carpentry.desc",
   "parent": "rftgumod:construction/construction",
   "idea": {
     "amount": 2,

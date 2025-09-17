@@ -12,6 +12,7 @@
     "x": 8,
     "y": 0
   },
+  "subtitle": "technology.transportation.desc",
   "parent": "rftgumod:survival/carts",
   "idea": {
     "amount": 2,

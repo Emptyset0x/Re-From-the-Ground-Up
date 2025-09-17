@@ -13,6 +13,7 @@
     "x": 4,
     "y": 0
   },
+  "subtitle": "technology.glassworking.desc",
   "parent": "rftgumod:construction/carpentry",
   "idea": {
     "amount": 1,

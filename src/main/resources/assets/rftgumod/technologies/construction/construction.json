@@ -13,6 +13,7 @@
     "x": 0,
     "y": 0
   },
+  "subtitle": "technology.construction.desc",
   "parent": "rftgumod:survival/stoneworking",
   "idea": {
     "amount": 1,

@@ -12,6 +12,7 @@
     "x": 2,
     "y": 1
   },
+  "subtitle": "technology.cartography.desc",
   "parent": "rftgumod:power/power",
   "idea": {
     "amount": 2,

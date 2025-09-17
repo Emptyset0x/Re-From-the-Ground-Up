@@ -3,8 +3,10 @@ package rftgumod.common.technology;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.DisplayInfo;
+import net.minecraft.client.gui.GuiSubtitleOverlay;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import rftgumod.api.technology.ITechnologyBuilder;
 import rftgumod.api.technology.recipe.IIdeaRecipe;
 import rftgumod.api.technology.recipe.IResearchRecipe;
@@ -32,7 +34,7 @@ public class TechnologyBuilder implements ITechnologyBuilder {
     private IIdeaRecipe idea;
     private IResearchRecipe research;
     private String stage;
-    private String subtilte;
+    private ITextComponent subtilte;
 
 
     public TechnologyBuilder(ResourceLocation id) {
@@ -65,6 +67,7 @@ public class TechnologyBuilder implements ITechnologyBuilder {
         stage = tech.stage;
         if (tech.hasChapter())
             chapter = tech.chapter.getRegistryName();
+        subtilte = tech.subtilte;
     }
 
     @Override
@@ -135,7 +138,7 @@ public class TechnologyBuilder implements ITechnologyBuilder {
     }
 
     @Override
-    public ITechnologyBuilder setSubtilte(String subtilte) {
+    public ITechnologyBuilder setSubtilte(ITextComponent subtilte) {
         this.subtilte = subtilte;
         return null;
     }

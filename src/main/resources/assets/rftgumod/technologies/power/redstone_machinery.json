@@ -12,6 +12,7 @@
     "x": 4,
     "y": 0
   },
+  "subtitle": "technology.redstone_machinery.desc",
   "parent": "rftgumod:power/circuitry",
   "idea": {
     "amount": 2,

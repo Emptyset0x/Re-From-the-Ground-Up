@@ -12,6 +12,7 @@
     "x": 6,
     "y": 4
   },
+  "subtitle": "technology.cooking.desc",
   "parent": "rftgumod:survival/agriculture",
   "idea": {
     "amount": 2,

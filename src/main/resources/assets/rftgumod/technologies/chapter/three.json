@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "minecraft:enchanting_table"
+      "item": "minecraft:stone"
     },
     "title": {
       "translate": "chapter.three.name"
@@ -9,6 +9,6 @@
     "description": {
       "translate": "chapter.three.desc"
     },
-    "background": "minecraft:textures/blocks/dirt.png"
+    "background": "minecraft:textures/blocks/stone.png"
   }
 }

@@ -13,6 +13,7 @@
     "x": 6,
     "y": 5
   },
+  "subtitle": "technology.dyes.desc",
   "parent": "rftgumod:survival/agriculture",
   "idea": {
     "amount": 1,

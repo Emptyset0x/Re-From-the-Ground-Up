@@ -12,6 +12,7 @@
     "x": 8,
     "y": 1
   },
+  "subtitle": "technology.gem_armor.desc",
   "parent": "rftgumod:survival/metal_armor",
   "idea": {
     "amount": 2,

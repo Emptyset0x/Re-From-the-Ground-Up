@@ -12,6 +12,7 @@
     "x": 2,
     "y": 2
   },
+  "subtitle": "technology.music.desc",
   "parent": "rftgumod:power/power",
   "idea": {
     "amount": 2,

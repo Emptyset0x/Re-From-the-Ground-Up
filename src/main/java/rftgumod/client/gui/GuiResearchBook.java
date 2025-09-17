@@ -1,5 +1,6 @@
 package rftgumod.client.gui;
 
+import com.google.common.collect.Maps;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -34,7 +35,6 @@ import rftgumod.common.technology.Chapter;
 import rftgumod.common.technology.Technology;
 import rftgumod.common.technology.TechnologyManager;
 import rftgumod.util.StackUtils;
-import rftgumod.util.SubCollection;
 
 import java.io.IOException;
 import java.util.*;
@@ -82,7 +82,7 @@ public class GuiResearchBook extends GuiScreen {
     private int pages;
 
 
-    private static final int WIDTH = 252, HEIGHT = 140, CORNER_SIZE = 30;
+    private static final int WIDTH = 252, HEIGHT = 152, CORNER_SIZE = 30;
     private static final int SIDE = 30, TOP = 40, BOTTOM = 30, PADDING = 9;
 
 
@@ -153,20 +153,20 @@ public class GuiResearchBook extends GuiScreen {
             x_max = x_max * 24 - 77;
             y_max = y_max * 24 - 77;
 
-            GuiButton page = new GuiButton(2, (width - imageWidth) / 2 + 24, height / 2 + 74, 125, 20,
-                    root.getDisplayInfo().getTitle().getFormattedText());
+            GuiButton page = new GuiButton(2, (width - imageWidth) / 2 + 24, height - 51, 125, 20,
+                    selectedChapter.getDisplayInfo().getTitle().getFormattedText());
             if (TechnologyManager.INSTANCE.getRoots().stream().filter(t -> t.canResearchIgnoreResearched(player))
                     .count() < 2)
                 page.enabled = false;
 
-            buttonList.add(new GuiButton(1, width / 2 + 24, height / 2 + 74, 80, 20, I18n.format("gui.done")));
+            buttonList.add(new GuiButton(1, width / 2 + 24, height - 51, 80, 20, I18n.format("gui.done")));
             buttonList.add(page);
 
             scroll = 1;
         } else {
-            buttonList.add(new GuiButton(1, width / 2 + 24, height / 2 + 74, 80, 20, I18n.format("gui.done")));
+            buttonList.add(new GuiButton(1, width / 2 + 24, height - 51, 80, 20, I18n.format("gui.done")));
             if (RFTGUConfig.allowResearchCopy && selected.canCopy()) {
-                GuiButton copy = new GuiButton(2, (width - imageWidth) / 2 + 24, height / 2 + 74, 125, 20,
+                GuiButton copy = new GuiButton(2, (width - imageWidth) / 2 + 24, height - 51, 125, 20,
                         I18n.format("gui.copy"));
                 copy.enabled = false;
                 for (int i = 0; i < player.inventory.getSizeInventory(); i++)
@@ -308,6 +308,17 @@ public class GuiResearchBook extends GuiScreen {
             showResearchTree = false;
             initGui();
         }
+        int index = 0;
+        for (Chapter chapter : TechnologyManager.INSTANCE.getChapters()){
+            if (chapter.hasCanResearchRoots(player)) {
+                if (type.isMouseOver(SIDE, TOP, width - SIDE - SIDE, height - SIDE - SIDE, index ,x ,y)){
+                    selectedChapter = chapter;
+                    showResearchTree = true;
+                    initGui();
+                }
+                index++;
+            }
+        }
         super.mouseClicked(x, y, b);
     }
 
@@ -341,7 +352,7 @@ public class GuiResearchBook extends GuiScreen {
         int right = width - SIDE;
         int bottom = height - SIDE;
 
-        int i1 = SIDE + 16;
+        int i1 = SIDE + 8;
         int j1 = TOP + 17;
 
         int boxLeft = left + PADDING;
@@ -363,10 +374,10 @@ public class GuiResearchBook extends GuiScreen {
         int chunkWidth = boxWidth / 16 + 1;
         for (int l3 = 0; l3 < chunkHeight; l3++) {
             for (int i4 = 0; i4 < chunkWidth; i4++) {
-                if (root.getDisplayInfo().getBackground() == null)
+                if (selectedChapter.getDisplayInfo().getBackground() == null)
                     mc.getTextureManager().bindTexture(STAINED_CLAY);
                 else
-                    mc.getTextureManager().bindTexture(root.getDisplayInfo().getBackground());
+                    mc.getTextureManager().bindTexture(selectedChapter.getDisplayInfo().getBackground());
                 if (l3 < chunkHeight - 1 && i4 < chunkWidth - 1)
                     drawModalRectWithCustomSizedTexture(i4 * 16, l3 * 16, 0, 0, 16, 16, 16, 16);
                 if (l3 == chunkHeight - 1 && i4 < chunkWidth - 1)
@@ -462,7 +473,7 @@ public class GuiResearchBook extends GuiScreen {
                         int xPoint = (int) (technologyForFrame.getDisplayInfo().getX() * 24 - interpolatedXScroll);
                         int yPoint = (int) (technologyForFrame.getDisplayInfo().getY() * 24 - interpolatedYScroll);
                         if (xPoint < -24 || yPoint < -24 || xPoint > (float)(boxRight - boxLeft) * zoom.get(root.getRegistryName())
-                                || yPoint > (float)(boxBottom - boxTop) * zoom.get(root.getRegistryName()))
+                                || yPoint > (float)(boxBottom - boxTop - 8) * zoom.get(root.getRegistryName()))
                             continue;
 
                         if (technologyForFrame.isResearched(player))
@@ -668,7 +679,12 @@ public class GuiResearchBook extends GuiScreen {
             if (showResearchTree) {
                 String s = selected.getDisplayInfo().getTitle().getFormattedText();
                 String s1 = selected.getDisplayInfo().getDescription().getFormattedText();
+                String s2 = null;
                 String s3 = null;
+
+                if (selected.hasSubtilte()) {
+                    s2 = selected.getSubtilte().getFormattedText();
+                }
                 if (selected.hasChapter()) {
                     s3 = selected.getChapter().getDisplayInfo().getDescription().getFormattedText();
                 }
@@ -686,31 +702,33 @@ public class GuiResearchBook extends GuiScreen {
                     i9 += 12;
 
                 if (selected.isResearched(player))
-                    fontRenderer.drawStringWithShadow(I18n.format("technology.researched"), i7, k7 + i9 + 4,
+                    fontRenderer.drawStringWithShadow(I18n.format("technology.researched"), i7, k7 +36,
                             0xff9090ff);
                 else if (children > 0)
                     fontRenderer.drawStringWithShadow(I18n.format(children == 1 ? "technology.tab" : "technology.tabs"),
-                            i7, k7 + i9 + 4, 0xffff5555);
+                            i7, k7 + 36, 0xffff5555);
                 fontRenderer.drawStringWithShadow(s, i7, k7, -1);
-                fontRenderer.drawStringWithShadow(s3, i7, k7 + 12, -1);
+                fontRenderer.drawStringWithShadow(s2, i7, k7 + 12, 0xffa0a0a0);
+                fontRenderer.drawStringWithShadow(s3, i7, k7 + 24, -1);
+
             } else {
                 String s1 = selected.getDisplayInfo().getTitle().getFormattedText();
                 int x1 = (width - fontRenderer.getStringWidth(s1)) / 2;
-                fontRenderer.drawStringWithShadow(s1, x1, l + 22, 0xffffff);
+                fontRenderer.drawStringWithShadow(s1, x1, TOP + 6, 0xffffff);
 
                 String s2 = selected.getDisplayInfo().getDescription().getFormattedText();
-                int x2 = width / 2;
-                int y2 = l + 32;
+                int x2 = (width / 2 + width - SIDE - SIDE) / 2;
+                int y2 = TOP + 35;
 
-                for (String s : fontRenderer.listFormattedStringToWidth(s2, 211)) {
-                    fontRenderer.drawStringWithShadow(s, x2 - (fontRenderer.getStringWidth(s) / 2), y2, 0xffa0a0a0);
+                for (String s : fontRenderer.listFormattedStringToWidth(s2, 180)) {
+                    fontRenderer.drawStringWithShadow(s, x2 - (fontRenderer.getStringWidth(s) / 2), y2, 0xffffff);
                     y2 += fontRenderer.FONT_HEIGHT;
                 }
 
                 String s3 = scroll + "/" + pages;
-                int x3 = (width + imageWidth) / 2 - fontRenderer.getStringWidth(s3);
-                int y3 = (height + imageHeight) / 2;
-                fontRenderer.drawStringWithShadow(s3, x3 - 21, y3 - 44, 0xffa0a0a0);
+                int x3 = width - SIDE - PADDING - fontRenderer.getStringWidth(s3);
+                int y3 = height;
+                fontRenderer.drawStringWithShadow(s3, x3 - 2  , y3 - 45, 0xffa0a0a0);
             }
         }
 

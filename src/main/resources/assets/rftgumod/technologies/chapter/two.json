@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "minecraft:furnace"
+      "item": "minecraft:redstone"
     },
     "title": {
       "translate": "chapter.two.name"
@@ -9,6 +9,6 @@
     "description": {
       "translate": "chapter.two.desc"
     },
-    "background": "minecraft:textures/blocks/dirt.png"
+    "background": "minecraft:textures/blocks/cobblestone.png"
   }
 }

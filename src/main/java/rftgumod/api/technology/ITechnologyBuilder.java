@@ -4,6 +4,7 @@ import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import rftgumod.api.technology.recipe.IIdeaRecipe;
 import rftgumod.api.technology.recipe.IResearchRecipe;
 import rftgumod.api.technology.unlock.IUnlock;
@@ -35,7 +36,7 @@ public interface ITechnologyBuilder {
 
     ITechnologyBuilder setChapter(ResourceLocation chapter);
 
-    ITechnologyBuilder setSubtilte(String subtilte);
+    ITechnologyBuilder setSubtilte(ITextComponent subtilte);
 
     /**
      * If this {@code TechnologyBuilder} was built from an existing

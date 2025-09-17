@@ -12,6 +12,7 @@
     "x": 8,
     "y": 2
   },
+  "subtitle": "technology.lapidary.desc",
   "parent": "rftgumod:survival/smithing",
   "idea": {
     "amount": 1,

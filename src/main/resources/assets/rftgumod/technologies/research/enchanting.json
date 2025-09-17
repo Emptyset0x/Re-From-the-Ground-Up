@@ -12,6 +12,7 @@
     "x": 4,
     "y": 0
   },
+  "subtitle": "technology.enchanting.desc",
   "parent": "rftgumod:research/bibliography",
   "criteria": {
     "item": {

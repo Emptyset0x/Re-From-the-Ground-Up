@@ -12,6 +12,7 @@
     "x": 4,
     "y": 2
   },
+  "subtitle": "technology.refinement.desc",
   "parent": "rftgumod:survival/stoneworking",
   "idea": {
     "amount": 2,

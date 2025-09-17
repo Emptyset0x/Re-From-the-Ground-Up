@@ -202,7 +202,10 @@ public interface ITechnology {
 
         boolean hasChapter();
         Chapter getChapter();
-        String getSubtilte();
-        boolean isChapterEqual(Chapter chapter);
+        ITextComponent getSubtilte();
+
+    boolean hasSubtilte();
+
+    boolean isChapterEqual(Chapter chapter);
 
 }
