@@ -121,7 +121,7 @@ public class StackUtils implements IStackUtils {
     @Nullable
     @Override
     public Technology getTechnology(ItemStack parchment) {
-        return TechnologyManager.INSTANCE.getTechnology(new ResourceLocation(getItemData(parchment).getString("FTGU")));
+        return TechnologyManager.INSTANCE.getTechnology(new ResourceLocation(getItemData(parchment).getString("RFTGU")));
     }
 
     @Override
