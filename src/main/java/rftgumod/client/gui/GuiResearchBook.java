@@ -1,6 +1,5 @@
 package rftgumod.client.gui;
 
-import com.google.common.collect.Maps;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -342,9 +341,6 @@ public class GuiResearchBook extends GuiScreen {
     }
 
     private void drawResearchScreen(int x, int y, float z) {
-
-        int k = (width - imageWidth) / 2;
-        int l = (height - imageHeight) / 2;
 
         int left = SIDE;
         int top = TOP;
