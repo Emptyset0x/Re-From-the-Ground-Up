@@ -665,8 +665,6 @@ public class GuiResearchBook extends GuiScreen {
                     iconIndex++;
                 }
             }
-            GlStateManager.disableLighting();
-            GlStateManager.popMatrix();
         }
 
         zLevel = 0.0F;
